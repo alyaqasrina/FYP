@@ -1,47 +1,250 @@
-/* Set background color for the body */
+/* Global Styles */
 body {
-  background-color: #F7F7F8;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 57px 80px 99px;
-  height: 100vh;
+  font-family: Arial, sans-serif;
   margin: 0;
-  font: 400 10px Nunito, sans-serif;
+  padding: 0;
+  background-color: #f4f4f9;
 }
 
-/* Style the login form */
-.login-form {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 300px;
-  text-align: center;
+/* Navigation Bar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #4A3C92;
+  color: #fff;
+  padding: 10px 20px;
 }
 
-/* Style the input fields */
-.login-form input[type="text"],
-.login-form input[type="password"] {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.navbar .logo {
+  display: flex;
+  align-items: center;
 }
 
-/* Style the submit button */
-.login-form button {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
+.navbar .logo img {
+  width: 40px;
+  margin-right: 10px;
+}
+
+.navbar .nav-links {
+  list-style-type: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar .nav-links li {
+  margin-right: 20px;
+}
+
+.navbar .nav-links a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.navbar .search-bar {
+  padding: 5px;
+  border-radius: 3px;
   border: none;
-  border-radius: 4px;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
   color: white;
-  font-size: 16px;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+/* Change the link color to #111 (black) on hover */
+li a:hover {
+  background-color: #111;
+}
+
+/* Sidebar */
+.sidebar {
+  background-color: #eef2fb;
+  width: 200px;
+  height: 100vh;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  padding-top: 20px;
+  text-align: left;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  padding: 15px;
   cursor: pointer;
 }
 
-.login-form button:hover {
-  background-color: #0056b3;
+.sidebar ul li:hover {
+  background-color: #ddd;
+}
+
+/* Main Content */
+.content {
+  margin-left: 220px;
+  padding: 20px;
+}
+
+.header-section {
+  text-align: center;
+  background: linear-gradient(to right, #d8c1fc, #b39dd9);
+  padding: 40px 0;
+  color: white;
+}
+
+.welcome-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.welcome-message {
+  display: flex;
+  align-items: center;
+}
+
+.welcome-message img {
+  width: 50px;
+  margin-right: 10px;
+}
+
+.task-list-section {
+  text-align: center;
+}
+
+.task-buttons {
+  margin: 20px 0;
+}
+
+.task-buttons button {
+  padding: 10px 20px;
+  margin: 0 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.edit-task {
+  background-color: white;
+  border: 1px solid black;
+}
+
+.add-task {
+  background-color: black;
+  color: white;
+}
+
+.task-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 20px auto;
+  max-width: 600px;
+  text-align: left;
+}
+
+.task-item {
+  padding: 15px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.task-item span {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.high-priority {
+  border-left: 5px solid red;
+}
+
+.medium-priority {
+  border-left: 5px solid yellow;
+}
+
+.low-priority {
+  border-left: 5px solid green;
+}
+
+.promo-section {
+  text-align: center;
+  margin: 30px 0;
+  background-color: #ddd;
+  padding: 20px;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 20px 0;
+  background-color: #4A3C92;
+  color: white;
+}
+
+.footer .footer-links a {
+  color: white;
+  text-decoration: none;
+  margin: 0 10px;
+}
+
+
+.footer {
+  background-color: #000; /* Black background */
+  color: #fff; /* White text */
+  text-align: center;
+  padding: 20px 0;
+  font-family: Arial, sans-serif;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.footer-section {
+  margin: 10px 0;
+}
+
+.footer-logo {
+  width: 150px;
+}
+
+.links-section a, .social-section a {
+  color: #fff;
+  text-decoration: none;
+  margin: 0 10px;
+}
+
+.links-section a:hover, .social-section a:hover {
+  text-decoration: underline;
+}
+
+.footer-bottom {
+  margin-top: 20px;
+  font-size: 14px;
 }

@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "FYP",
+			"path": "."
+		},
+		{
+			"name": "calendify",
+			"path": "../../../../../../xampp/htdocs/calendify"
+		}
+	],
+	"settings": {}
+}

@@ -3,12 +3,12 @@ require('db.php');
 
 if (isset($_POST['submit'])) {
     $email = stripslashes($_REQUEST['email']);
-    $email = mysqli_real_escape_string($con, $email);
+    $email = mysqli_real_escape_string($conn, $email);
     $password = stripslashes($_REQUEST['password']);
-    $password = mysqli_real_escape_string($con, $password);
+    $password = mysqli_real_escape_string($conn, $password);
 
     $email_search = "SELECT * FROM users WHERE email='$email'";
-    $query = mysqli_query($con, $email_search);
+    $query = mysqli_query($conn, $email_search);
 
     $email_count = mysqli_num_rows($query);
 
@@ -24,7 +24,7 @@ if (isset($_POST['submit'])) {
             echo "Login successful";
             ?>
             <script>
-                location.replace("index.php");
+                location.replace("homepage.php");
             </script>
             <?php
         } else {
@@ -43,13 +43,18 @@ if (isset($_POST['submit'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <title>Calendify</title>
+    <!-- Just an image -->
+    <nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand" href="index.php">
+        <img src="calendify\logo.png" width="30" height="30" alt="">
+    </a>
+    </nav>
 </head>
 <body>
     <section class="login-container">
         <div class="login-form-wrapper">
             <div class="login-content">
                 <form class="login-form" action="login.php" method="POST">
-                    <img src="calendify/logo.png" alt="Calendify logo" class="logo">
                     <h2 class="login-title">Log in to your Calendify account</h2>
                     <label for="email" class="input-label">Email address</label><br>
                     <input type="email" id="email" name="email" class="input-field" placeholder="example@gmail.com" required><br>

@@ -38,14 +38,10 @@
         <section class="welcome-section">
             <div class="welcome-message">
                 <img src="path-to-avatar.png">
-
                 <?php
-                require('db.php');
-
                 if (isset($_SESSION['username'])) {
                     echo '<p>Welcome, ' . $_SESSION['username'] . '!</p>';
                 } 
-
                 ?>
                 <p>Welcome to the Calendify!</p>
             </div>
@@ -62,40 +58,22 @@
 
             <ul class="task-list">
                 <li class="task-item high-priority">
-                    <?php
-                    if (isset($_SESSION['username'])) {
-                        echo '<span> High Priority' . $_SESSION['task_name'] . '</span>';
-                    }   
-                    ?>
+                    <h4>Task 1</h4>
+                    <p>Task Description</p>
+                    <p>Due Date: 01/01/2024</p>
+                    <button class="delete-task">Delete</button>
                 </li>
                 <li class="task-item medium-priority">
-                    <span>Group Submission</span>
-                    <span>Due: 2024-06-10</span>
-                    <span class="priority">Medium Priority</span>
+                    <h4>Task 2</h4>
+                    <p>Task Description</p>
+                    <p>Due Date: 01/01/2024</p>
+                    <button class="delete-task">Delete</button>
                 </li>
                 <li class="task-item low-priority">
-                    <span>Mainboard Monthly Meeting</span>
-                    <span>Due: 2024-06-25</span>
-                    <span class="priority">Low Priority</span>
+                    <h4>Task 3</h4>
+                    <p>Task Description</p>
+                    <p>Due Date: 01/01/2024</p>
+                    <button class="delete-task">Delete</button>
                 </li>
             </ul>
         </section>
-
-        <section class="promo-section">
-            <div class="promo">
-                Stay on top of your tasks with Calendify
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2024 Calendify. All rights reserved.</p>
-        <div class="footer-links">
-            <a href="#privacy">Privacy Policy</a>
-            <a href="#terms">Terms of Service</a>
-        </div>
-    </footer>
-
-</body>
-</html>
