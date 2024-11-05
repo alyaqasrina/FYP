@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendify | Smart Personal Assistant</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -22,7 +22,7 @@
             <li><a href="homepage.php">Home</a></li>
             <li><a href="tasks.php">Tasks</a></li>
             <li><a href="calendar.php">Calendar</a></li>
-            <li><a href="setting.php">Settings</a></li>
+            <li><a href="settings.php">Settings</a></li>
             <li><a href="logout.php">Logout</a></li>
         </ul>
         <input type="text" class="search-bar" placeholder="Search in site">
@@ -63,20 +63,30 @@
             <ul class="task-list">
                 <li class="task-item high-priority">
                     <?php
-                    if (isset($_SESSION['username'])) {
-                        echo '<span> High Priority' . $_SESSION['task_name'] . '</span>';
-                    }   
+                    foreach ($tasks as $task) {
+                        echo '<span>' . $task['task_name'] . '</span>';
+                        echo '<span>Due: ' . $task['due_date'] . '</span>';
+                        echo '<span class="priority">' . $task['priority'] . '</span>';
+                    }
                     ?>
                 </li>
                 <li class="task-item medium-priority">
-                    <span>Group Submission</span>
-                    <span>Due: 2024-06-10</span>
-                    <span class="priority">Medium Priority</span>
+                    <?php
+                    foreach ($tasks as $task) {
+                        echo '<span>' . $task['task_name'] . '</span>';
+                        echo '<span>Due: ' . $task['due_date'] . '</span>';
+                        echo '<span class="priority">' . $task['priority'] . '</span>';
+                    }
+                    ?>
                 </li>
                 <li class="task-item low-priority">
-                    <span>Mainboard Monthly Meeting</span>
-                    <span>Due: 2024-06-25</span>
-                    <span class="priority">Low Priority</span>
+                    <?php
+                    foreach ($tasks as $task) {
+                        echo '<span>' . $task['task_name'] . '</span>';
+                        echo '<span>Due: ' . $task['due_date'] . '</span>';
+                        echo '<span class="priority">' . $task['priority'] . '</span>';
+                    }
+                    ?>
                 </li>
             </ul>
         </section>

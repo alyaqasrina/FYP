@@ -31,7 +31,7 @@ if ($userCheckResult->num_rows == 0) {
             <li><a href="homepage.php">Home</a></li>
             <li><a href="tasks.php">Tasks</a></li>
             <li><a href="calendar.php">Calendar</a></li>
-            <li><a href="setting.php">Settings</a></li>
+            <li><a href="settings.php">Settings</a></li>
             <li><a href="logout.php">Logout</a></li>
         </ul>
         <input type="text" class="search-bar" placeholder="Search in site">
