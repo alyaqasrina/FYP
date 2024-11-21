@@ -1,0 +1,93 @@
+body {
+    background-color: #fff;
+    font-family: sans-serif;
+    margin: 0;
+}
+
+.navbar {
+    background-color: #6650a8;
+    padding: 15px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.navbar-header {
+    display: flex;
+    align-items: center;
+}
+
+/* index page */
+.index-section-welcome {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    min-height: 30vh;
+}
+
+.index-title-description {
+    font-size: 1rem;
+    margin-top: 20px; /* Use margin-top for spacing */
+    text-align: center;
+}
+
+.index-title {
+    font-size: 2.5rem;
+    text-align: center;
+}
+
+.index-section-description {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.index-content-description {
+    text-align: center;
+    padding: 20px; /* Add padding here */
+}
+
+
+
+.btn {
+    background-color: #6650a8;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin: 10px;
+}
+
+.btn-primary {
+    background-color: #6650a8;
+}
+
+.footer {
+    background-color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px; /* Adjust padding as needed */
+  }
+  
+  .footer-container ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+  }
+  
+  .footer-container li {
+    margin-right: 20px; /* Adjust spacing as needed */
+  }
+  
+  .copyright {
+    font-size: 14px;
+  }

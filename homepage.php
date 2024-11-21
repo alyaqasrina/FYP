@@ -57,7 +57,6 @@
 
             <div class="task-buttons">
                 <button onclick="window.location.href='edit_task.php'"class="edit-task">Edit Task</button>
-                <button onclick="window.location.href='add_task.php'" class="add-task">Add Task</button>
             </div>
 
             <ul class="task-list">
