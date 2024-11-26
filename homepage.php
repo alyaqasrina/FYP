@@ -1,110 +1,103 @@
 <?php
-  require('db.php');
+    session_start(); // Start the session to access session variables
+    require('db.php');
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendify | Smart Personal Assistant</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Calendify</title> 
+    <nav class="navbar-homepage">
+        <div class="logo">
+            <img src="logo_new.png" alt="Calendify Logo" href="index.php">
+            <h3 class="navbar-title">CALENDIFY</h3>
+        </div>
+        <div class="nav-links">
+            <a href="homepage.php">Home</a>
+            <a href="tasks.php">Tasks</a>
+            <a href="calendar.php">Calendar</a>
+            <a href="settings.php">Settings</a>
+            <a href="logout.php">Logout</a>
+        </div>
+        <input type="text" class="search-bar" placeholder="Search">
+    </nav>
 </head>
 <body>
 
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="logo">
-            <img src="logo.png" alt="Calendify Logo">
-            <h1>CALENDIFY</h1>
-        </div>
-        <ul class="nav-links">
-            <li><a href="homepage.php">Home</a></li>
-            <li><a href="tasks.php">Tasks</a></li>
-            <li><a href="calendar.php">Calendar</a></li>
-            <li><a href="settings.php">Settings</a></li>
-            <li><a href="logout.php">Logout</a></li>
-        </ul>
-        <input type="text" class="search-bar" placeholder="Search in site">
-    </nav>
-
     <!-- Main Content -->
-    <main class="content">
-        <section class="header-section">
-            <h2>Calendify: Smart Personal Assistant</h2>
-            <p>Organize your tasks efficiently</p>
+    <section class="homepage">
+        <section class="header-section-homepage">
+            <h2 class="index-title">Calendify: Smart Personal Assistant</h2>
+            <p class="index-title-description">Organize your tasks efficiently</p>
         </section>
 
         <section class="welcome-section">
             <div class="welcome-message">
-                <img src="path-to-avatar.png">
-
-                <?php
-                require('db.php');
-
-                if (isset($_SESSION['username'])) {
-                    echo '<p>Welcome, ' . $_SESSION['username'] . '!</p>';
-                } 
-
-                ?>
-                <p>Welcome to the Calendify!</p>
+                <img src="avatar.png" class="avatar-image" alt="Avatar">
+                <h3>
+                    Welcome, 
+                    <?php 
+                    // Check if the username is set in the session
+                    if (isset($_SESSION['username'])) {
+                        echo htmlspecialchars($_SESSION['username']); // Use htmlspecialchars to prevent XSS
+                    } else {
+                        echo "Guest"; // Or handle it in another way if not logged in
+                    }
+                    ?>!
+                </h3>
             </div>
         </section>
 
         <section class="task-list-section">
-            <h3>Task List</h3>
-            <p>Manage your tasks efficiently</p>
+            <div class="task-wrapper">
+                <div class="task-content-title">
+                    <h2 class="task-title">Task List</h2>
+                    <p class="task-title-description">Here are your tasks for today:</p>
+                    <button onclick="window.location.href='add_task.php'" type="button" class="btn btn-primary">Add Task</button>
+                </div>
+                <div class="task-table">
+                    <table>
+                        <tr>
+                            <th>Task Name</th>
+                            <th>Due Date</th>
+                            <th>Priority</th>
+                        </tr>
+                        <?php
+                        // Fetch tasks from the database
+                        $query = "SELECT * FROM tasks";
+                        $result = mysqli_query($conn, $query);
+                        $tasks = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-            <div class="task-buttons">
-                <button onclick="window.location.href='edit_task.php'"class="edit-task">Edit Task</button>
-            </div>
-
-            <ul class="task-list">
-                <li class="task-item high-priority">
-                    <?php
-                    foreach ($tasks as $task) {
-                        echo '<span>' . $task['task_name'] . '</span>';
-                        echo '<span>Due: ' . $task['due_date'] . '</span>';
-                        echo '<span class="priority">' . $task['priority'] . '</span>';
-                    }
-                    ?>
-                </li>
-                <li class="task-item medium-priority">
-                    <?php
-                    foreach ($tasks as $task) {
-                        echo '<span>' . $task['task_name'] . '</span>';
-                        echo '<span>Due: ' . $task['due_date'] . '</span>';
-                        echo '<span class="priority">' . $task['priority'] . '</span>';
-                    }
-                    ?>
-                </li>
-                <li class="task-item low-priority">
-                    <?php
-                    foreach ($tasks as $task) {
-                        echo '<span>' . $task['task_name'] . '</span>';
-                        echo '<span>Due: ' . $task['due_date'] . '</span>';
-                        echo '<span class="priority">' . $task['priority'] . '</span>';
-                    }
-                    ?>
-                </li>
-            </ul>
-        </section>
-
-        <section class="promo-section">
-            <div class="promo">
-                Stay on top of your tasks with Calendify
+                        // Display the tasks in the table
+                        foreach ($tasks as $task) {
+                            echo '<tr>';
+                            echo '<td>' . $task['task_name'] . '</td>';
+                            echo '<td>' . $task['due_date'] . '</td>';
+                            echo '<td>' . $task['priority'] . '</td>';
+                            echo '</tr>';
+                        }
+                        ?>
+                    </table>
+                </div>
             </div>
         </section>
-    </main>
 
     <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2024 Calendify. All rights reserved.</p>
-        <div class="footer-links">
-            <a href="#privacy">Privacy Policy</a>
-            <a href="#terms">Terms of Service</a>
+    <section class="footer-section">
+        <footer class="footer">
+        <div class="footer-container">
+                <a href="homepage.php">Home</a>
+                <a href="aboutus.php">About Us</a>
+                <a href="privacypolicy.php">Privacy Policy</a>
         </div>
-    </footer>
+        <div class="footer-bottom">
+            &copy; 2024 Calendify. All rights reserved.
+        </div>
+        </footer>
+    </section>
 
 </body>
 </html>
