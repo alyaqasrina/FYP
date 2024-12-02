@@ -1,11 +1,10 @@
-
 <?php
 session_start(); // Start the session to access session variables
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['logout'])) {
         session_destroy(); // Destroy the session
-        header('Location: index.php'); // Redirect to login page
+        header('Location: login.php'); // Redirect to login page
         exit();
     } elseif (isset($_POST['cancel'])) {
         header('Location: homepage.php'); // Redirect to homepage or another appropriate page
