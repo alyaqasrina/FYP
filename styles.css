@@ -477,43 +477,130 @@ body {
 }
 
 /* Add Task page */
-.add-task {
+.add-task-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh; /* Full viewport height */
-    background-color: #fff;
-    margin-top: 20px;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 30px 0;
 }
 
 .add-task-title {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 5vh;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    text-align: center;
 }
 
-.add-task-form {
+.main-task-form, .subtask-form {
     background: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 500px;
-    text-align: center;
-    margin: 30px;
-    margin-bottom: auto;
+    width: 100%;
+    margin: 0 auto;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
 }
 
-.add-task-form label {
+.main-task-form label, .subtask-form label {
     display: block;
-    margin-bottom: 0 0 5px;
+    margin-bottom: 5px;
+    font-weight: bold;
 }
 
-.add-task-form input {
-    width: 90%; /* Adjusted to match button width */
+.main-task-form input, .subtask-form input, 
+.main-task-form textarea, .subtask-form textarea, 
+.main-task-form select, .subtask-form select {
+    width: 90%;
     padding: 10px;
-    margin: 5px 0; /* Unified margin */
-    border: 2px solid #ccc; /* Increased border width */
+    margin: 5px 0;
+    border: 2px solid #ccc;
     border-radius: 4px;
+    font-size: 1rem;
 }
+
+.main-task-form input:focus, .subtask-form input:focus, 
+.main-task-form textarea:focus, .subtask-form textarea:focus, 
+.main-task-form select:focus, .subtask-form select:focus {
+    border-color: #6650a8;
+    outline: none;
+    box-shadow: 0 0 5px rgba(102, 80, 168, 0.5);
+}
+
+.main-task-form input:hover, .subtask-form input:hover, 
+.main-task-form textarea:hover, .subtask-form textarea:hover, 
+.main-task-form select:hover, .subtask-form select:hover {
+    border-color: #6650a8;
+}
+
+.subtask-button-save{
+    background-color: #6650a8;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 70%;
+    font-size: 1rem;
+    margin: 20px auto;
+    display: block;
+}
+
+.save-task-button{
+    background-color: #6650a8;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 15%;
+    font-size: 1rem;
+    margin: auto;
+    display: block;
+}
+
+    .task-table {
+        width: 80%;
+        border-collapse: collapse;
+        margin: auto;
+        background-color: white;
+    }
+
+    .task-table thead {
+        background-color: gray 100%;
+        white-space: nowrap;
+    }
+
+    .task-table th {
+        padding: 8px;
+        text-align: left;
+        font: semi-bold;
+        color: gray 800;
+    }
+
+    .task-table tbody{
+        white-space: nowrap;
+    }
+
+    .task-table td{
+        padding: 4px;
+        text-size-adjust: 15px;
+        color: gray 800;
+    }
+    
+    .task-table tr: :hover{
+        background-color: #f1f1f1 50;
+    }
+    
+    .low-priority {
+        background-color: #d4edda;
+    }
+    .medium-priority {
+        background-color: #ffeeba;
+    }
+    .high-priority {
+        background-color: #f8d7da;
+    }
 
