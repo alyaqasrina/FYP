@@ -1,29 +1,34 @@
 <?php
 session_start();
-include('db.php'); // Ensure database connection is correct
+include('db.php'); // Ensure this connects properly to the database
+
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = mysqli_real_escape_string($conn, $_POST['password']);
 
-    // Query to check email and password
-    $query = "SELECT user_id, password FROM users WHERE email = ?";
+    // Query to check if the user exists
+    $query = "SELECT * FROM users WHERE email = ?";
     $stmt = mysqli_prepare($conn, $query);
     mysqli_stmt_bind_param($stmt, "s", $email);
     mysqli_stmt_execute($stmt);
-    mysqli_stmt_bind_result($stmt, $user_id, $hashed_password);
-    mysqli_stmt_fetch($stmt);
-    mysqli_stmt_close($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $user = mysqli_fetch_assoc($result);
 
-    // Verify password
-    if ($user_id && password_verify($password, $hashed_password)) {
+    if ($user && password_verify($password, $user['password'])) {
         // Set session variables
-        $_SESSION['user_id'] = $user_id;
-        $_SESSION['email'] = $email; // Optional, if you need email in the session
-        header("Location: homepage.php");
+        $_SESSION['user_id'] = $user['user_id'];
+        $_SESSION['email'] = $user['email'];
+        $_SESSION['username'] = $user['username'];
+
+        // Redirect to homepage
+        header('Location: homepage.php');
         exit();
     } else {
-        echo "<p>Invalid email or password.</p>";
+        $error = "Invalid email or password.";
     }
 }
 ?>
@@ -31,47 +36,52 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="styles.css" />
-    <title>Calendify</title> 
-    <nav class="navbar">
-        <div class="logo">
-            <img src="logo_new.png" alt="Calendify Logo" href="index.php">
-            <h3 class="navbar-title">CALENDIFY</h3>
-        </div>
-    </nav>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Calendify</title>
+    <link href="css/styles.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
-<body>
-    <section class="login">
-        <div class="login-form">
-            <form action="login.php" method="POST">
-                <h2 class="login-title">Log in to your Calendify account</h2>
-                <div class="form-group">
-                    <label for="email" class="email-label">Email address</label>
-                    <input type="email" id="email" name="email" class="input-field" placeholder="example@gmail.com" required><br>
+<body class="login-container">
+    <div id="layoutAuthentication">
+        <div id="layoutAuthentication_content">
+            <main>
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-5">
+                            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                <div class="card-header"><h3 class="text-center font-weight-light my-4">Login to your Calendify</h3></div>
+                                <div class="card-body">
+                                    <?php if (isset($error)): ?>
+                                        <div class="alert alert-danger"><?php echo $error; ?></div>
+                                    <?php endif; ?>
+                                    <form action="login.php" method="POST">
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="inputEmail" name="email" type="email" placeholder="name@example.com" required />
+                                            <label for="inputEmail">Email address</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="inputPassword" name="password" type="password" placeholder="Password" required />
+                                            <label for="inputPassword">Password</label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" id="inputRememberPassword" type="checkbox" value="" />
+                                            <label class="form-check-label" for="inputRememberPassword">Remember Password</label>
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                                            <button class="btn btn-primary" type="submit">Login</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="card-footer text-center py-3">
+                                    <div class="small"><a href="register.php">Need an account? Sign up!</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="password" class="password-label">Password</label>
-                    <input type="password" id="password" name="password" class="input-field" placeholder="Enter your password" required>
-                </div>
-                <button type="submit" name="submit" class="btn btn-primary">Log in</button>
-                <p class="login-signup">Don't have an account? <a href="signup.php">Sign Up here</a></p>
-            </form>
+            </main>
         </div>
-    </section>
-
-    <section class="footer-section">
-        <footer class="footer">
-            <div class="footer-container">
-                <a href="homepage.php">Home</a>
-                <a href="aboutus.php">About Us</a>
-                <a href="privacypolicy.php">Privacy Policy</a>
-            </div>
-            <div class="footer-bottom">
-                &copy; 2024 Calendify. All rights reserved.
-            </div>
-        </footer>
-    </section>
+    </div>
 </body>
 </html>

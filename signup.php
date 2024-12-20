@@ -1,16 +1,16 @@
 <?php
 require('db.php');
 
-if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['confirm-password']) && isset($_POST['phone_number'])) {
-    $username = stripslashes($_REQUEST['username']);
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = stripslashes($_POST['username']);
     $username = mysqli_real_escape_string($conn, $username);
-    $phoneNumber = stripslashes($_REQUEST['phone_number']);
+    $phoneNumber = stripslashes($_POST['phone_number']);
     $phoneNumber = mysqli_real_escape_string($conn, $phoneNumber);
-    $email = stripslashes($_REQUEST['email']);
+    $email = stripslashes($_POST['email']);
     $email = mysqli_real_escape_string($conn, $email);
-    $password = stripslashes($_REQUEST['password']);
+    $password = stripslashes($_POST['password']);
     $password = mysqli_real_escape_string($conn, $password);
-    $confirm_password = stripslashes($_REQUEST['confirm-password']);
+    $confirm_password = stripslashes($_POST['confirm-password']);
     $confirm_password = mysqli_real_escape_string($conn, $confirm_password);
 
     // Check if passwords match
@@ -22,7 +22,7 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
     } else {
         // Check if username or email already exists
         $query = "SELECT * FROM `users` WHERE username='$username' OR email='$email'";
-        $result = mysqli_query($conn, $query) or die(mysqli_error($con));
+        $result = mysqli_query($conn, $query) or die(mysqli_error($conn));
         $rows = mysqli_num_rows($result);
 
         if ($rows > 0) {
@@ -31,19 +31,22 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
                   <p class='link'>Click here to <a href='signup.php'>register</a> again.</p>
                   </div>";
         } else {
-            // Insert new user into the database
+            // Hash the password
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $query = "INSERT INTO `users` (username, email, password) VALUES ('$username', '$email', '$hashed_password')";
+
+            // Insert user data into the database
+            $query = "INSERT INTO `users` (username, email, password, phone_number) 
+                      VALUES ('$username', '$email', '$hashed_password', '$phoneNumber')";
             $result = mysqli_query($conn, $query);
 
             if ($result) {
                 echo "<div class='form'>
-                      <h3>You have registered successfully.</h3><br/>
+                      <h3>You are registered successfully.</h3><br/>
                       <p class='link'>Click here to <a href='login.php'>login</a></p>
                       </div>";
             } else {
                 echo "<div class='form'>
-                      <h3>Required fields are missing.</h3><br/>
+                      <h3>Registration failed. Please try again.</h3><br/>
                       <p class='link'>Click here to <a href='signup.php'>register</a> again.</p>
                       </div>";
             }
@@ -55,61 +58,50 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="styles.css" />
-    <title>Calendify</title> 
-    <nav class="navbar">
-        <div class="logo">
-            <img src="logo_new.png" alt="Calendify Logo" href="index.php">
-            <h3 class="navbar-title">CALENDIFY</h3>
-        </div>
-    </nav>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup - Calendify</title>
+    <link href="css/styles.css" rel="stylesheet">
 </head>
 <body>
-
-    <section class="signup">
-    <div class="signup-form">
-        <h2 class="signup-title">Sign Up</h2>
-        <form action="signup.php" method="POST">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="card shadow-lg border-0 rounded-lg mt-5">
+                    <div class="card-header"><h3 class="text-center font-weight-light my-4">Sign Up</h3></div>
+                    <div class="card-body">
+                        <form action="signup.php" method="POST">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="inputUsername" name="username" type="text" placeholder="Username" required />
+                                <label for="inputUsername">Username</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="inputEmail" name="email" type="email" placeholder="name@example.com" required />
+                                <label for="inputEmail">Email address</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="inputPhoneNumber" name="phone_number" type="text" placeholder="Phone Number" required />
+                                <label for="inputPhoneNumber">Phone Number</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="inputPassword" name="password" type="password" placeholder="Password" required />
+                                <label for="inputPassword">Password</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="inputConfirmPassword" name="confirm-password" type="password" placeholder="Confirm Password" required />
+                                <label for="inputConfirmPassword">Confirm Password</label>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                                <button class="btn btn-primary" type="submit">Sign Up</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer text-center py-3">
+                        <div class="small"><a href="login.php">Have an account? Go to login</a></div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="phone_number">Phone Number</label>
-                <input type="text" id="phone_number" name="phone_number" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <div class="form-group">
-                <label for="confirm-password">Confirm Password</label>
-                <input type="password" id="confirm-password" name="confirm-password" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Sign Up</button>
-            <p class="login-page-signup">Already have an account? <a href="login.php">Login here</a></p>
-        </form>
+        </div>
     </div>
-    </section>
-
-    <section class="footer-section">
-        <footer class="footer">
-        <div class="footer-container">
-                <a href="homepage.php">Home</a>
-                <a href="aboutus.php">About Us</a>
-                <a href="privacypolicy.php">Privacy Policy</a>
-        </div>
-        <div class="footer-bottom">
-            &copy; 2024 Calendify. All rights reserved.
-        </div>
-        </footer>
-    </section>
-
 </body>
 </html>

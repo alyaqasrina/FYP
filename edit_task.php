@@ -57,23 +57,99 @@
             </div>
 
             <ul class="task-list">
-                <li class="task-item high-priority">
-                    <h4>Task 1</h4>
-                    <p>Task Description</p>
-                    <p>Due Date: 01/01/2024</p>
-                    <button class="delete-task">Delete</button>
-                </li>
-                <li class="task-item medium-priority">
-                    <h4>Task 2</h4>
-                    <p>Task Description</p>
-                    <p>Due Date: 01/01/2024</p>
-                    <button class="delete-task">Delete</button>
-                </li>
-                <li class="task-item low-priority">
-                    <h4>Task 3</h4>
-                    <p>Task Description</p>
-                    <p>Due Date: 01/01/2024</p>
-                    <button class="delete-task">Delete</button>
-                </li>
+                <?php
+                // Fetch tasks from the database
+                $query = "SELECT * FROM tasks";
+                $result = mysqli_query($conn, $query);
+                
+                if ($result && mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo '<li>' . $row['task_name'] . '</li>';
+                    }
+                } else {
+                    echo '<p>No tasks found.</p>';
+                }
+
+                
+
+
+                ?>
             </ul>
         </section>
+    </main>
+</body>
+</html>
+
+<?php
+// Database connection
+$conn = new mysqli("localhost", "root", "", "your_database_name");
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch the task ID from the query string
+if (isset($_GET['task_id'])) {
+    $task_id = intval($_GET['task_id']);
+    
+    // Fetch task details
+    $query = "SELECT * FROM tasks WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $task_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $task = $result->fetch_assoc();
+    } else {
+        die("Task not found.");
+    }
+} else {
+    die("Invalid request.");
+}
+
+// Handle form submission for updating the task
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $task_name = $_POST['task_name'];
+    $task_description = $_POST['task_description'];
+    $task_due_date = $_POST['task_due_date'];
+
+    // Update task details
+    $update_query = "UPDATE tasks SET name = ?, description = ?, due_date = ? WHERE id = ?";
+    $update_stmt = $conn->prepare($update_query);
+    $update_stmt->bind_param("sssi", $task_name, $task_description, $task_due_date, $task_id);
+
+    if ($update_stmt->execute()) {
+        echo "Task updated successfully.";
+        header("Location: task_table.php"); // Redirect back to the task table
+        exit;
+    } else {
+        echo "Error updating task: " . $conn->error;
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Task</title>
+</head>
+<body>
+    <h1>Edit Task</h1>
+    <form action="edit_task.php?task_id=<?php echo $task_id; ?>" method="post">
+        <label for="task_name">Task Name:</label>
+        <input type="text" name="task_name" id="task_name" value="<?php echo htmlspecialchars($task['name']); ?>" required><br>
+
+        <label for="task_description">Task Description:</label>
+        <textarea name="task_description" id="task_description" required><?php echo htmlspecialchars($task['description']); ?></textarea><br>
+
+        <label for="task_due_date">Due Date:</label>
+        <input type="date" name="task_due_date" id="task_due_date" value="<?php echo htmlspecialchars($task['due_date']); ?>" required><br>
+
+        <button type="submit">Update Task</button>
+    </form>
+</body>
+</html>
