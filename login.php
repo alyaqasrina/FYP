@@ -1,37 +1,29 @@
 <?php
-session_start(); // Start the session
-require('db.php');
+session_start();
+include('db.php'); // Ensure database connection is correct
 
-if (isset($_POST['submit'])) {
-    $email = stripslashes($_REQUEST['email']);
-    $email = mysqli_real_escape_string($conn, $email);
-    $password = stripslashes($_REQUEST['password']);
-    $password = mysqli_real_escape_string($conn, $password);
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
 
-    // Search for the email in the database
-    $email_search = "SELECT * FROM users WHERE email='$email'";
-    $query = mysqli_query($conn, $email_search);
+    // Query to check email and password
+    $query = "SELECT user_id, password FROM users WHERE email = ?";
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $user_id, $hashed_password);
+    mysqli_stmt_fetch($stmt);
+    mysqli_stmt_close($stmt);
 
-    $email_count = mysqli_num_rows($query);
-
-    if ($email_count) {
-        $email_pass = mysqli_fetch_assoc($query);
-        $db_pass = $email_pass['password'];
-
-        // Verify the password
-        $pass_decode = password_verify($password, $db_pass);
-
-        if ($pass_decode) {
-            // Set the session variable for username
-            $_SESSION['username'] = $email_pass['username'];
-            // Redirect to homepage
-            header("Location: homepage.php");
-            exit(); // Always use exit after header redirection
-        } else {
-            echo "Password incorrect";
-        }
+    // Verify password
+    if ($user_id && password_verify($password, $hashed_password)) {
+        // Set session variables
+        $_SESSION['user_id'] = $user_id;
+        $_SESSION['email'] = $email; // Optional, if you need email in the session
+        header("Location: homepage.php");
+        exit();
     } else {
-        echo "Invalid email";
+        echo "<p>Invalid email or password.</p>";
     }
 }
 ?>

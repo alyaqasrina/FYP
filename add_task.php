@@ -1,48 +1,90 @@
 <?php
 session_start();
-require('db.php'); // Ensure db.php contains the correct database connection code.
+include('db.php'); // Ensure this connects properly to the database
+
+// Function to determine priority class
+function getPriorityClass($priority) {
+    switch (strtolower($priority)) {
+        case 'low':
+            return 'low-priority';
+        case 'medium':
+            return 'medium-priority';
+        case 'high':
+            return 'high-priority';
+        default:
+            return '';
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Validate and sanitize main task inputs
+    // Check if user is logged in
+    if (!isset($_SESSION['user_id'])) {
+        die("Error: User is not logged in.");
+    }
+
+    $user_id = $_SESSION['user_id'];
+
+    // Validate and sanitize inputs
     $task_name = mysqli_real_escape_string($conn, $_POST['task_name']);
     $task_description = mysqli_real_escape_string($conn, $_POST['description']);
     $due_date = mysqli_real_escape_string($conn, $_POST['due_date']);
     $priority = mysqli_real_escape_string($conn, $_POST['priority']);
 
     // Insert main task into the database
-    $query = "INSERT INTO `tasks` (task_name, description, due_date, priority) 
-              VALUES ('$task_name', '$task_description', '$due_date', '$priority')";
-    if (mysqli_query($conn, $query)) {
-        $task_id = mysqli_insert_id($conn); // Get the ID of the inserted task
+    $query = "INSERT INTO `tasks` (task_name, description, due_date, priority, user_id) 
+              VALUES (?, ?, ?, ?, ?)";
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, "ssssi", $task_name, $task_description, $due_date, $priority, $user_id);
+    
+    if (mysqli_stmt_execute($stmt)) {
+        $task_id = mysqli_insert_id($conn); // Get the inserted task's ID
 
-        // Handle subtasks
-        if (isset($_POST['subtask_name'])) {
+        // Handle subtasks if provided
+        if (!empty($_POST['subtask_name'])) {
             $subtask_names = $_POST['subtask_name'];
             $subtask_due_dates = $_POST['subtask_due_date'];
-            $subtask_priorities = $_POST['subtask_priority'];
-
+            $subtask_priority = $_POST['subtask_priority'];
+        
+            $subtask_query = "INSERT INTO `subtasks` (task_id, subtask_name, subtask_due_date, subtask_priority) 
+                              VALUES (?, ?, ?, ?)";
+            $subtask_stmt = mysqli_prepare($conn, $subtask_query);
+        
             foreach ($subtask_names as $index => $subtask_name) {
-                // Validate and sanitize subtask inputs
                 $subtask_name = mysqli_real_escape_string($conn, $subtask_name);
                 $subtask_due_date = mysqli_real_escape_string($conn, $subtask_due_dates[$index]);
-                $subtask_priority = mysqli_real_escape_string($conn, $subtask_priorities[$index]);
-
-                // Insert subtask into the database
-                $subtask_query = "INSERT INTO `subtasks` (task_id, subtask_name, subtask_description, subtask_due_date, subtask_priority) 
-                                  VALUES ('$task_id', '$subtask_name', '$subtask_due_date', '$subtask_priority')";
-                mysqli_query($conn, $subtask_query);
+                $subtask_priority = mysqli_real_escape_string($conn, $subtask_priority[$index]);
+        
+                if (empty($subtask_name) || empty($subtask_due_date) || empty($subtask_priority)) {
+                    die("Error: All subtask fields are required.");
+                }
+        
+                mysqli_stmt_bind_param($subtask_stmt, "isss", $task_id, $subtask_name, $subtask_due_date, $subtask_priority);
+                mysqli_stmt_execute($subtask_stmt);
             }
         }
+        
+        // Display the main task and subtasks
+        echo "<h2>Task Added:</h2>";
+        echo "<table>";
+        echo "<tr><th>Task Name</th><th>Task Description</th><th>Due Date</th><th>Priority</th></tr>";
+        echo "<tr><td>$task_name</td><td>$task_description</td><td>$due_date</td><td class='task-priority " . getPriorityClass($priority) . "'>$priority</td></tr>";
+        echo "</table>";
 
-        echo "<div class='form'>
-              <h3>Task and subtasks added successfully.</h3><br/>
-              <p class='link'>Click here to <a href='tasks.php'>view tasks</a></p>
-              </div>";
+        echo "<h3>Subtasks:</h3>";
+        echo "<table>";
+        echo "<tr><th>Subtask Name</th><th>Subtask Due Date</th><th>Subtask Priority</th></tr>";
+        for ($i = 0; $i < count($subtask_names); $i++) {
+            echo "<tr>";
+            echo "<td>" . htmlspecialchars($subtask_names[$i]) . "</td>";
+            echo "<td>" . htmlspecialchars($subtask_due_dates[$i]) . "</td>";
+            echo "<td class='task-priority " . getPriorityClass($subtask_priority[$i]) . "'>" . htmlspecialchars($subtask_priority[$i]) . "</td>";
+            echo "</tr>";
+        }
+        echo "</table>";
+        echo "<p>Task added successfully!</p>";
+        echo "<button onclick='window.location.href=\"homepage.php\"' class='btn btn-primary'>Go Back</button>";
     } else {
-        echo "<div class='form'>
-              <h3>Error: Could not add task.</h3><br/>
-              <p class='link'>Click here to <a href='add_task.php'>try again</a>.</p>
-              </div>";
+        echo "<p>Error adding task: " . mysqli_error($conn) . "</p>";
     }
 }
 ?>
@@ -78,6 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="add-task-container">
                     <div class="main-task-form">
                         <h2 class="main-task-title">Main Task</h2>
+                        <p class="main-task-description">Enter the details of the main task</p>
                         
                         <div class="main-task-form-group"> 
                             <label for="task_name">Task Name:</label>
@@ -85,8 +128,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </div>
 
                         <div class="main-task-form-group">
-                            <label for="task_description">Task Description:</label>
-                            <textarea name="task_description" required></textarea>
+                            <label for="description">Task Description:</label>
+                            <textarea name="description" required></textarea>
                         </div>
 
                         <div class="main-task-form-group">
@@ -97,16 +140,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="main-task-form-group">
                             <label for="priority" class="task-priority">Priority:</label>
                             <select name="priority" required>
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
                             </select>
                         </div>
                     </div>
                     
                     <div class="subtask-form">
                         <h2 class="subtask-title">Subtasks</h2>
-
+                        <p class="subtask-description">Enter the details of the subtasks</p>
                         <div class="subtask-group">
                             <div class="subtask-form-group">
                                 <label for="subtask_name">Subtask Name:</label>
@@ -114,39 +157,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </div>
 
                             <div class="subtask-form-group">
-                                <label for="subtask_due_date">Due Date:</label>
+                                <label for="subtask_due_date">Subtask Due Date:</label>
                                 <input type="date" name="subtask_due_date[]" required>
                             </div>
 
                             <div class="subtask-form-group">
-                                <label for="subtask_priority" class="task-priority">Priority:</label>
+                                <label for="subtask_status" class="task-priority">Subtask Priority:</label>
                                 <select name="subtask_priority[]" required>
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
                                 </select>
                             </div>
                         </div>
-                        <button type="button" class="subtask-button-save" onclick="addSubtask()">Add Another Subtask</button>
+                        <button type="button" class="btn btn-primary" onclick="addSubtask()">Add Another Subtask</button>
                     </div>
                 </div>
-                <button type="submit" class="save-task-button">Save Task</button>
+                <button type="submit" class="btn btn-primary">Save Task</button>
             </form>
         </div>
     </section>
 
     <script>
         function addSubtask() {
-            const subtaskGroup = document.querySelector('.subtask-group');
-            const newSubtask = subtaskGroup.cloneNode(true);
-            newSubtask.querySelectorAll('input').forEach(input => input.value = '');
-            newSubtask.querySelectorAll('textarea').forEach(textarea => textarea.value = '');
-            newSubtask.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
-            document.querySelector('.subtask-form').appendChild(newSubtask);
+        const subtaskForm = document.querySelector('.subtask-form');
+        const subtaskGroup = document.querySelector('.subtask-group');
+        const newSubtask = subtaskGroup.cloneNode(true);
+
+        // Clear inputs
+        newSubtask.querySelectorAll('input, select').forEach((input) => {
+            input.value = '';
+            const name = input.getAttribute('name');
+            if (name) {
+                const indexMatch = name.match(/\[\d+\]/);
+                if (indexMatch) {
+                    const newIndex = document.querySelectorAll('.subtask-group').length;
+                    const newName = name.replace(/\[\d+\]/, `[${newIndex}]`);
+                    input.setAttribute('name', newName);
+                }
+            }
+        });
+
+        subtaskForm.appendChild(newSubtask);
         }
-    </script>
-    
-    <?php
+
         function getPriorityClass($priority) {
             switch (strtolower($priority)) {
                 case 'low':
@@ -158,112 +212,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 default:
                     return '';
             }
-
-        function editTask($task_name) {
-            echo "<script>alert('Edit Task: {$task_name}');</script>";
-            // Redirect to an edit form or load data into existing form
-            echo "<script>window.location.href = 'edit_task.php?task_name={$task_name}';</script>";
         }
-        
-        function deleteTask($task_name) {
-            echo "<script>
-                if(confirm('Are you sure you want to delete the task: {$task_name}?')) {
-                    window.location.href = 'delete_task.php?task_name={$task_name}';
-                }
-            </script>";
-        }
-        
-        function editSubtask($subtask_name) {
-            echo "<script>alert('Edit Subtask: {$subtask_name}');</script>";
-            // Redirect to an edit form or load data into existing form
-            echo "<script>window.location.href = 'edit_subtask.php?subtask_name={$subtask_name}';</script>";
-        }
-        
-        function deleteSubtask($subtask_name) {
-            echo "<script>
-                if(confirm('Are you sure you want to delete the subtask: {$subtask_name}?')) {
-                    window.location.href = 'delete_subtask.php?subtask_name={$subtask_name}';
-                }
-            </script>";
-        }       
-    }
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        // Get main task details
-        $task_name = htmlspecialchars($_POST['task_name']);
-        $task_description = htmlspecialchars($_POST['task_description']);
-        $due_date = htmlspecialchars($_POST['due_date']);
-        $priority = htmlspecialchars($_POST['priority']);
-
-        // Get subtasks details
-        $subtask_names = $_POST['subtask_name'] ?? [];
-        $subtask_due_dates = $_POST['subtask_due_date'] ?? [];
-        $subtask_priorities = $_POST['subtask_priority'] ?? [];
-
-        // Display the main task
-        echo "<h2>Tasks:</h2>";
-        echo "<table class='task-table'>";
-        echo "<thead>
-                <tr>
-                    <th>Task Name</th>
-                    <th>Task Description</th>
-                    <th>Due Date</th>
-                    <th>Priority</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>";
-        echo "<tbody>";
-        echo "<tr>
-                <td>{$task_name}</td>
-                <td>{$task_description}</td>
-                <td>{$due_date}</td>
-                <td class='" . getPriorityClass($priority) . "'>{$priority}</td>
-                <td>
-                    <button onclick=\"editTask('$task_name')\" style='border: none; background: none; cursor: pointer;'>
-                        <img src='edit.png' alt='Edit' style='width: 25px; height: 25px;'>
-                    </button>
-                    <button onclick=\"deleteTask('$task_name')\" style='border: none; background: none; cursor: pointer;'>
-                        <img src='trash.png' alt='Delete' style='width: 30px; height: 30px;'>
-                    </button>
-                </td>
-            </tr>";
-        echo "</tbody>";
-        echo "</table>";
-
-        echo "<h3>Subtasks:</h3>";
-        echo "<table class='task-table'>";
-        echo "<thead>
-                <tr>
-                    <th>Subtask Name</th>
-                    <th>Subtask Description</th>
-                    <th>Subtask Due Date</th>
-                    <th>Subtask Priority</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>";
-        echo "<tbody>";
-        foreach ($subtask_names as $index => $subtask_name) {
-            $subtask_due_date = htmlspecialchars($subtask_due_dates[$index] ?? '');
-            $subtask_priority = htmlspecialchars($subtask_priorities[$index] ?? '');
-            echo "<tr>
-                    <td>{$subtask_name}</td>
-                    <td>{$subtask_description}</td>
-                    <td>{$subtask_due_date}</td>
-                    <td class='" . getPriorityClass($subtask_priority) . "'>{$subtask_priority}</td>
-                    <td>
-                    <button onclick=\"editSubtask('$subtask_name')\" style='border: none; background: none; cursor: pointer;'>
-                        <img src='edit.png' alt='Edit' style='width: 25px; height: 25px;'>
-                    </button>
-                    <button onclick=\"deleteSubtask('$subtask_name')\" style='border: none; background: none; cursor: pointer;'>
-                        <img src='trash.png' alt='Delete' style='width: 30px; height: 30px;'>
-                    </button>
-                    </td>
-                </tr>";
-        }
-        echo "</tbody>";
-        echo "</table>";
-        }
-    ?>
-
+    </script>
 </body>
 </html>
