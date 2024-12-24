@@ -3,7 +3,7 @@ session_start();
 include('db.php');
 
 // Get form data
-$name = $_POST['name'];
+$name = $_POST['username'];
 $email = $_POST['email'];
 $phone = $_POST['phone'];
 $notification_method = $_POST['notification_method'];

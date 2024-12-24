@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="css/styles.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
+    <div class="signup-container">
         <div class="row justify-content-center">
             <div class="col-lg-5">
                 <div class="card shadow-lg border-0 rounded-lg mt-5">
