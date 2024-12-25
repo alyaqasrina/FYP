@@ -1,155 +1,368 @@
 <?php
-  require('db.php');
-?>
+session_start();
+include('db.php'); // Ensure this connects properly to the database
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendify | Smart Personal Assistant</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="logo">
-            <img src="logo.png" alt="Calendify Logo">
-            <h1>CALENDIFY</h1>
-        </div>
-        <ul class="nav-links">
-            <li><a href="homepage.php">Home</a></li>
-            <li><a href="tasks.php">Tasks</a></li>
-            <li><a href="calendar.php">Calendar</a></li>
-            <li><a href="setting.php">Settings</a></li>
-            <li><a href="logout.php">Logout</a></li>
-        </ul>
-        <input type="text" class="search-bar" placeholder="Search in site">
-    </nav>
-
-    <!-- Main Content -->
-    <main class="content">
-        <section class="header-section">
-            <h2>Calendify: Smart Personal Assistant</h2>
-            <p>Organize your tasks efficiently</p>
-        </section>
-
-        <section class="welcome-section">
-            <div class="welcome-message">
-                <img src="path-to-avatar.png">
-                <?php
-                if (isset($_SESSION['username'])) {
-                    echo '<p>Welcome, ' . $_SESSION['username'] . '!</p>';
-                } 
-                ?>
-                <p>Welcome to the Calendify!</p>
-            </div>
-        </section>
-
-        <section class="task-list-section">
-            <h3>Task List</h3>
-            <p>Manage your tasks efficiently</p>
-
-            <div class="task-buttons">
-                <button onclick="window.location.href='edit_task.php'"class="edit-task">Edit Task</button>
-                <button onclick="window.location.href='add_task.php'" class="add-task">Add Task</button>
-            </div>
-
-            <ul class="task-list">
-                <?php
-                // Fetch tasks from the database
-                $query = "SELECT * FROM tasks";
-                $result = mysqli_query($conn, $query);
-                
-                if ($result && mysqli_num_rows($result) > 0) {
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo '<li>' . $row['task_name'] . '</li>';
-                    }
-                } else {
-                    echo '<p>No tasks found.</p>';
-                }
-
-                
-
-
-                ?>
-            </ul>
-        </section>
-    </main>
-</body>
-</html>
-
-<?php
-// Database connection
-$conn = new mysqli("localhost", "root", "", "your_database_name");
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    die("Error: User is not logged in.");
 }
 
-// Fetch the task ID from the query string
+$user_id = $_SESSION['user_id'];
+
+// Retrieve task and subtasks data
 if (isset($_GET['task_id'])) {
     $task_id = intval($_GET['task_id']);
     
-    // Fetch task details
-    $query = "SELECT * FROM tasks WHERE id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $task_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+// Fetch main task details
+$task_query = "SELECT * FROM `tasks` WHERE `task_id` = ? AND `user_id` = ?";
+$stmt = mysqli_prepare($conn, $task_query);
+mysqli_stmt_bind_param($stmt, "ii", $task_id, $user_id);
+mysqli_stmt_execute($stmt);
+$task_result = mysqli_stmt_get_result($stmt);
+$task = mysqli_fetch_assoc($task_result);
 
-    if ($result->num_rows > 0) {
-        $task = $result->fetch_assoc();
-    } else {
-        die("Task not found.");
+    if (!$task) {
+        die("Error: Task not found or you do not have access to it.");
     }
-} else {
-    die("Invalid request.");
-}
-
-// Handle form submission for updating the task
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $task_name = $_POST['task_name'];
-    $task_description = $_POST['task_description'];
-    $task_due_date = $_POST['task_due_date'];
-
-    // Update task details
-    $update_query = "UPDATE tasks SET name = ?, description = ?, due_date = ? WHERE id = ?";
-    $update_stmt = $conn->prepare($update_query);
-    $update_stmt->bind_param("sssi", $task_name, $task_description, $task_due_date, $task_id);
-
-    if ($update_stmt->execute()) {
-        echo "Task updated successfully.";
-        header("Location: task_table.php"); // Redirect back to the task table
-        exit;
+        // Fetch subtasks
+        $subtask_query = "SELECT * FROM `subtasks` WHERE `task_id` = ?";
+        $stmt = mysqli_prepare($conn, $subtask_query);
+        mysqli_stmt_bind_param($stmt, "i", $task_id);
+        mysqli_stmt_execute($stmt);
+        $subtasks_result = mysqli_stmt_get_result($stmt);
+        $subtasks = mysqli_fetch_all($subtasks_result, MYSQLI_ASSOC);
     } else {
-        echo "Error updating task: " . $conn->error;
+        die("Error: Task ID is required.");
     }
+
+// Handle form submission for updates
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $task_name = mysqli_real_escape_string($conn, $_POST['task_name']);
+    $task_description = mysqli_real_escape_string($conn, $_POST['description']);
+    $due_date = mysqli_real_escape_string($conn, $_POST['due_date']);
+    $priority = mysqli_real_escape_string($conn, $_POST['priority']);
+
+    // Update main task
+    $update_task_query = "UPDATE `tasks` SET `task_name` = ?, `description` = ?, `due_date` = ?, `priority` = ? WHERE `task_id` = ? AND `user_id` = ?";
+    $stmt = mysqli_prepare($conn, $update_task_query);
+    mysqli_stmt_bind_param($stmt, "ssssii", $task_name, $task_description, $due_date, $priority, $task_id, $user_id);
+
+    if (!mysqli_stmt_execute($stmt)) {
+        die("Error updating task: " . mysqli_error($conn));
+    }
+
+    // Handle subtasks updates
+    $subtask_ids = $_POST['subtask_id'] ?? [];
+    $subtask_names = $_POST['subtask_name'] ?? [];
+    $subtask_due_dates = $_POST['subtask_due_date'] ?? [];
+    $subtask_priorities = $_POST['subtask_priority'] ?? [];
+
+    foreach ($subtask_ids as $index => $subtask_id) {
+        $subtask_name = mysqli_real_escape_string($conn, $subtask_names[$index]);
+        $subtask_due_date = mysqli_real_escape_string($conn, $subtask_due_dates[$index]);
+        $subtask_priority = mysqli_real_escape_string($conn, $subtask_priorities[$index]);
+
+        if (empty($subtask_name) || empty($subtask_due_date) || empty($subtask_priority)) {
+            die("Error: All subtask fields are required.");
+        }
+
+        // Update or insert subtasks
+        if ($subtask_id) {
+            $update_subtask_query = "UPDATE `subtasks` SET `subtask_name` = ?, `subtask_due_date` = ?, `subtask_priority` = ? WHERE `subtask_id` = ? AND `task_id` = ?";
+            $stmt = mysqli_prepare($conn, $update_subtask_query);
+            mysqli_stmt_bind_param($stmt, "sssii", $subtask_name, $subtask_due_date, $subtask_priority, $subtask_id, $task_id);
+            mysqli_stmt_execute($stmt);
+        } else {
+            $insert_subtask_query = "INSERT INTO `subtasks` (`task_id`, `subtask_name`, `subtask_due_date`, `subtask_priority`) VALUES (?, ?, ?, ?)";
+            $stmt = mysqli_prepare($conn, $insert_subtask_query);
+            mysqli_stmt_bind_param($stmt, "isss", $task_id, $subtask_name, $subtask_due_date, $subtask_priority);
+            mysqli_stmt_execute($stmt);
+        }
+    }
+    // JavaScript for Success Popup and Redirect
+    echo "<script>
+    alert('Task and subtasks updated successfully!');
+    window.location.href = 'task.php';
+    </script>";
+    exit;
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Task</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Calendify</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
-<body>
-    <h1>Edit Task</h1>
-    <form action="edit_task.php?task_id=<?php echo $task_id; ?>" method="post">
-        <label for="task_name">Task Name:</label>
-        <input type="text" name="task_name" id="task_name" value="<?php echo htmlspecialchars($task['name']); ?>" required><br>
+<body class="sb-nav-fixed">
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+        <!-- Navbar Brand-->
+        <a class="navbar-brand ps-3" href="homepage.php">
+            <img src="path/to/logo.png" style="height: 30px; width: auto;">
+            Calendify
+        </a>
+        <!-- Sidebar Toggle-->
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+        <!-- Navbar Search-->
+        <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            <div class="input-group">
+                <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+                <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
+            </div>
+        </form>
+        <!-- Navbar-->
+        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+                    <li><a class="dropdown-item" href="settings.php">Setting</a></li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
 
-        <label for="task_description">Task Description:</label>
-        <textarea name="task_description" id="task_description" required><?php echo htmlspecialchars($task['description']); ?></textarea><br>
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <div class="sb-sidenav-menu-heading"><Main></Main></div>
+                        <a class="nav-link" href="homepage.php">
+                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            Dashboard
+                        </a>
+                        <div class="sb-sidenav-menu-heading">Task</div>
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                            <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                            Overview
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="task.php">Task</a>
+                                <a class="nav-link" href="monitor_status.php">Monitor Status</a>
+                                <a class="nav-link" href="calendar.php">Calendar</a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <div class="sb-sidenav-footer">
+                    <div class="small">Logged in as:</div>
+                        <?php 
+                            echo $_SESSION['username'];
+                        ?>
+                </div>
+            </nav>
+        </div>
 
-        <label for="task_due_date">Due Date:</label>
-        <input type="date" name="task_due_date" id="task_due_date" value="<?php echo htmlspecialchars($task['due_date']); ?>" required><br>
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4">
+                    <h1 class="mt-4">Edit Task</h1>
+                    <ol class="breadcrumb mb-4">
+                        <li class="breadcrumb-item-active">Please fill out the details of your task and subtasks that you want to edit</li>
+                    </ol>
+                    <div class="row">
+                    <div class="col-xl-3 col-md-6"></div>
+                    <form action="edit_task.php?task_id=<?= $task_id ?>" method="POST">
+                            <div class="edit-task-container"> 
+                                <div class="main-task-form">
+                                    <h2 class="main-task-title">Edit Main Task</h2>
+                                    <p class="main-task-description">Edit the details of the main task</p>
+                                
+                                    <div class="form-floating mb-3">
+                                        <input type="text" name="task_name" class="form-control" value="<?= htmlspecialchars($task['task_name']) ?>" required>
+                                        <label for="task_name">Task Name:</label>
+                                    </div>
+                       
+                                    <div class="form-floating mb-3">
+                                        <input type="text" name="description" class="form-control" value="<?= htmlspecialchars($task['description']) ?>" required>
+                                        <label for="description">Task Description:</label>
+                                    </div>
 
-        <button type="submit">Update Task</button>
-    </form>
+                                    <div class="form-floating mb-3">
+                                        <input type="date" name="due_date" class="form-control" value="<?= htmlspecialchars($task['due_date']) ?>" required>
+                                        <label for="due_date">Due Date:</label>
+                                    </div>
+
+                                    <div class="form-floating mb-3">
+                                        <select name="priority" class="form-control" required>
+                                            <option value="Low" <?= $task['priority'] === 'Low' ? 'selected' : '' ?>>Low</option>
+                                            <option value="Medium" <?= $task['priority'] === 'Medium' ? 'selected' : '' ?>>Medium</option>
+                                            <option value="High" <?= $task['priority'] === 'High' ? 'selected' : '' ?>>High</option>
+                                        </select>
+                                        <label for="priority">Priority:</label>
+                                    </div>
+                                </div>
+
+                                <div class="subtask-form">
+                                <h2 class="subtask-title">Edit Subtasks</h2>
+                                <p class="subtask-description">Edit the details of the subtasks</p>
+
+                                <div id="subtask-group">
+                                    <?php foreach ($subtasks as $index => $subtask): ?>
+                                    <div class="subtask-group mb-3">
+                                        <h5>Subtask <?= $index + 1 ?></h5>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" name="subtask_name[]" class="form-control" value="<?= htmlspecialchars($subtask['subtask_name']) ?>" required>
+                                            <label>Subtask Name:</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                         <input type="date" name="subtask_due_date[]" class="form-control" value="<?= htmlspecialchars($subtask['subtask_due_date']) ?>" required>
+                                         <label>Due Date:</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <select name="subtask_priority[]" class="form-control" required>
+                                                <option value="Low" <?= $subtask['subtask_priority'] === 'Low' ? 'selected' : '' ?>>Low</option>
+                                                <option value="Medium" <?= $subtask['subtask_priority'] === 'Medium' ? 'selected' : '' ?>>Medium</option>
+                                                <option value="High" <?= $subtask['subtask_priority'] === 'High' ? 'selected' : '' ?>>High</option>
+                                            </select>
+                                            <label>Priority:</label>
+                                        </div>
+                                        <?php endforeach; ?>
+                                </div>
+                                <div class="main-buttons">
+                                    <button type="button" class="btn btn-primary" onclick="addSubtask()">Add Subtask</button>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                                </div>
+                            </div>
+                    </form>
+                    </div>
+                </div>
+            </main>
+            <footer class="py-4 bg-light mt-auto">
+                    <div class="container-fluid px-4">
+                        <div class="d-flex align-items-center justify-content-between small">
+                            <div class="text-muted"> &copy; 2024 Calendify. All rights reserved</div>
+                            <div>
+                                <a href="#">Privacy Policy</a>
+                                    &middot;
+                                <a href="#">Terms &amp; Conditions</a>
+                            </div>
+                        </div>
+                    </div>
+            </footer>
+        </div>
+    </div>                                    
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successModalLabel">Success</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Task and subtasks updated successfully!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="redirectToTask()">Go to Task Page</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <script>
+            function addSubtask() {
+                const subtaskForm = document.querySelector('.subtask-form'); // The container for subtasks
+
+                // Create a new subtask HTML structure dynamically
+                const newSubtask = document.createElement('div');
+                newSubtask.classList.add('subtask-group', 'mb-3'); // Add a class for styling if needed
+
+                // Add input fields for the new subtask
+                newSubtask.innerHTML = `
+                    <div class="form-floating mb-3"> 
+                    <input type="text" name="subtask_name[]" class="form-control" required>
+                    <label for="subtask_name">Subtask Name:</label>
+                    </div>
+                    <div class="form-floating mb-3"> 
+                        <input type="date" name="subtask_due_date[]" class="form-control" required>
+                        <label for="subtask_due_date">Due Date:</label>
+                    </div>
+                    <div class="form-floating mb-3"> 
+                        <select name="subtask_priority[]" class="form-control" required>                                <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                        <label for="subtask_priority">Priority:</label>
+                    </div>
+                    <button type="button" class="btn btn-danger" onclick="removeSubtask(this)">Remove Subtask</button>
+                    <button type="button" class="btn btn-primary" onclick="addSubtask()">Add Another Subtask</button>
+                    <button type="submit" class="btn btn-primary">Save Task</button>
+                    `;
+
+                // Append the new subtask form to the container
+                subtaskForm.appendChild(newSubtask);
+
+                // Update button visibility
+                toggleButtons();
+            }
+
+            function removeSubtask(button) {
+                const subtaskGroup = button.parentElement; // Get the parent `.subtask-group` div
+                subtaskGroup.remove();
+
+                // Update button visibility
+                toggleButtons();
+            }
+
+            function toggleButtons() {
+            const subtaskGroups = document.querySelectorAll('.subtask-group'); // Get all subtask groups
+            const mainButtons = document.querySelector('.main-buttons'); // Main buttons container
+
+            if (subtaskGroups.length === 0) {
+                // Show the main buttons if no subtasks exist
+                mainButtons.style.display = 'block';
+            } else {
+                // Hide the main buttons if subtasks exist
+                mainButtons.style.display = 'none';
+
+            // Ensure only the last subtask group displays its buttons
+            subtaskGroups.forEach((group, index) => {
+                const addButton = group.querySelector('.btn-primary'); // Add Another Subtask button
+                const saveButton = group.querySelector('.btn-primary'); // Save Task button
+
+                if (index === subtaskGroups.length - 1) {
+                    // Show buttons for the last subtask group
+                    addButton.style.display = 'inline-block';
+                    saveButton.style.display = 'inline-block';
+                } else {
+                    // Hide buttons for all other subtask groups
+                    addButton.style.display = 'none';
+                    saveButton.style.display = 'none';
+                }
+            });
+            }
+
+            // Special case: Ensure first subtask always has buttons if it is the only one
+            if (subtaskGroups.length === 1) {
+                const firstGroup = subtaskGroups[0];
+                const addButton = firstGroup.querySelector('.btn-primary');
+                const saveButton = firstGroup.querySelector('.btn-primary');
+                addButton.style.display = 'inline-block';
+                saveButton.style.display = 'inline-block';
+            }
+        }
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <script src="js/scripts.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>       <script src="assets/demo/chart-area-demo.js"></script>
+        <script src="assets/demo/chart-bar-demo.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+        <script src="js/datatables-simple-demo.js"></script>
 </body>
 </html>
+

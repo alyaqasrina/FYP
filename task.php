@@ -165,8 +165,8 @@
                                                 echo '<td>' . $task['task_due_date'] . '</td>';
                                                 echo '<td>' . $task['subtask_name'] . '</td>';
                                                 echo '<td>' . $task['subtask_due_date'] . '</td>';
-                                                echo '<td><a href="edit_task.php?id=' . $task['task_id'] . '">Edit</a></td>';
-                                                echo '<td><a href="delete_task.php?id=' . $task['task_id'] . '">Delete</a></td>';
+                                                echo '<td><a href="edit_task.php?task_id=' . $task['task_id'] . '">Edit</a></td>';
+                                                echo '<td><a href="delete_task.php?task_id=' . $task['task_id'] . '">Delete</a></td>';
                                                 echo '</tr>';
                                             }
                                             

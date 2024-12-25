@@ -338,19 +338,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 saveButton.style.display = 'inline-block';
             }
         }
-
-        function getPriorityClass($priority) {
-            switch (strtolower($priority)) {
-                case 'low':
-                    return 'low-priority';
-                case 'medium':
-                    return 'medium-priority';
-                case 'high':
-                    return 'high-priority';
-                default:
-                    return '';
-            }
-        }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>

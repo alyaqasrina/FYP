@@ -697,7 +697,8 @@ progress {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.add-task-container {
+.add-task-container,
+.edit-task-container {
   padding: 20px;
   background-color: #f5f5f5;
   display: flex;
@@ -719,7 +720,8 @@ progress {
 }
 
 @media (max-width: 768px) {
-  .add-task-container {
+  .add-task-container,
+  .edit-task-container {
       flex-direction: column; /* Stack forms vertically on smaller screens */
       align-items: center; /* Center align vertically stacked forms */
   }
