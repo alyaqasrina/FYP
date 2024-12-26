@@ -625,80 +625,9 @@ progress {
   color: #6c757d;
 }
 
-.setting-container {
-  padding: 20px;
-  background-color: #f5f5f5;
-}
-
-.card-setting {
-  margin: 20px auto;
-  border-radius: 8px;
-  background: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-
-.card-header-setting {
-  background-color: transparent;
-  text-align: center;
-  font-size: 1.5em;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.card-body-setting {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.setting-container.label {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.form-control-setting {
-  border-radius: 4px;
-  padding: 10px;
-  font-size: 1rem;
-}
-
-.setting-container.select {
-  width: 100%;
-  padding: 10px;
-  font-size: 1rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-.setting-container.btn {
-  background-color: #5cb85c;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.setting-container.btn:hover {
-  background-color: #4cae4c;
-}
-
-.popup-success {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background-color: #28a745;
-  color: white;
-  padding: 15px;
-  border-radius: 4px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
 .add-task-container,
-.edit-task-container {
+.edit-task-container,
+.settings-container {
   padding: 20px;
   background-color: #f5f5f5;
   display: flex;
@@ -731,6 +660,17 @@ progress {
       width: 100%; /* Adjust width to fit smaller screens */
       margin-bottom: 20px; /* Add spacing between stacked forms */
   }
+}
+
+.popup-center-top {
+  position: fixed;
+  top: 20px; /* Adjust to set distance from top */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1050; /* Ensures it appears above other content */
+  width: 50%; /* Adjust width as needed */
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .container,

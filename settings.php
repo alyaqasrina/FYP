@@ -86,7 +86,6 @@ $notification_method = isset($_POST['notification_method']) ? $_POST['notificati
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
-                        <div class="sb-sidenav-menu-heading">Settings</div>
                         <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                             <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                             Settings
@@ -94,6 +93,7 @@ $notification_method = isset($_POST['notification_method']) ? $_POST['notificati
                         </a>
                         <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="settings.php">Profile & Notifications</a>
                                 <a class="nav-link" href="send_reminder.php">Send Reminder</a>
                             </nav>
                         </div>
@@ -108,83 +108,92 @@ $notification_method = isset($_POST['notification_method']) ? $_POST['notificati
             </nav>
         </div>
 
-        <div class="setting-container">
-            <div class="row justify-content-center">
-                <!-- Profile Settings -->
-                <div class="col-lg-6">
-                    <div class="card-setting">
-                        <div class="card-header-setting">Profile Information</div>
-                        <div class="card-body-setting">
-                            <form action="save_settings.php" method="POST">
-                                <label for="inputUsername">Name</label>
-                                <input
-                                    class="form-control"
-                                    id="inputUsername"
-                                    value="<?php echo isset($user['name']) ? htmlspecialchars($user['name']) : ''; ?>"
-                                    name="username"
-                                    type="text"
-                                    placeholder="Enter your name"
-                                    required
-                                />
-                                <label for="inputEmail">Email</label>
-                                <input
-                                    class="form-control"
-                                    id="inputEmail"
-                                    value="<?php echo $user['email']; ?>"
-                                    name="email"
-                                    type="email"
-                                    placeholder="Enter your email"
-                                    required
-                                />
-                                <label for="inputPassword">Password</label>
-                                <input
-                                    class="form-control"
-                                    id="inputPassword"
-                                    name="password"
-                                    type="password"
-                                    placeholder="Enter new password"
-                                    required
-                                />
-                                <button class="btn mt-3" type="submit">Save Settings</button>
-                            </form>
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4">
+                    <h1 class="mt-4">Settings</h1>
+                    <ol class="breadcrumb mb-4">
+                        <li class="breadcrumb-item-active">Adjust your profile and notification settings how you want it!</li>
+                    </ol>
+                    <div class="row">
+                    <div class="col-xl-3 col-md-6"></div>
+                    <form action="save_settings.php" method="POST">
+                        <div class="settings-container">
+                            <!-- Profile Settings -->
+                            <div class="main-task-form">
+                            <h2 class="main-task-title">Profile Settings</h2>
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="inputUsername" placeholder="Enter your new userame" name="username" value="<?php echo isset($user['name']) ? htmlspecialchars($user['name']) : ''; ?>">
+                                    <label for="inputUsername">Name</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="inputEmail" placeholder="Enter your new email" name="email" value="<?php echo isset($user['email']) ? htmlspecialchars($user['email']) : ''; ?>">
+                                    <label for="inputEmail">Email</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="inputPhoneNumber" placeholder="Enter your new phone number" name="phone_number" value="<?php echo isset($user['phone_number']) ? htmlspecialchars($user['phone_number']) : ''; ?>">
+                                    <label for="inputPhoneNumber">Phone Number</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="password" class="form-control" id="inputPassword" placeholder="Enter your new password" name="password">
+                                    <label for="inputPassword">Password</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="password" class="form-control" id="inputConfirmPassword" placeholder="Confirm your new password" name="confirm_password">
+                                    <label for="inputConfirmPassword">Confirm Password</label>
+                                </div>
+                                <button class="btn btn-primary" type="submit">Save Settings</button>
+                            </div>
+                            <!-- Notification Settings -->
+                             <div class="subtask-form">
+                                <h2 class="subtask-title">Notification Preferences</h2>
+                                <div class="form-floating mb-3">
+                                    <select name="notification_method" class="form-control">
+                                        <option value="email" <?php if ($notification_method == 'email') echo 'selected'; ?>>Email</option>
+                                        <option value="sms" <?php if ($notification_method == 'sms') echo 'selected'; ?>>SMS</option>
+                                        <option value="inapp" <?php if ($notification_method == 'inapp') echo 'selected'; ?>>In-App</option>
+                                    </select>
+                                    <label for="notification_method">Notification Method</label>
+                                </div>
+                                <button class="btn btn-primary" type="submit">Save Settings</button>
+                             </div>
                         </div>
+                    </form>
                     </div>
                 </div>
-
-                <!-- Notification Settings -->
-                <div class="col-lg-6">
-                    <div class="card-setting">
-                        <div class="card-header-setting">Notification Preferences</div>
-                        <div class="card-body-setting">
-                            <form action="save_settings.php" method="POST">
-                                <label for="notification_method">Email Notifications</label>
-                                <select name="email_notifications" class="form-control-setting">
-                                    <option value="on">On</option>
-                                    <option value="off">Off</option>
-                                </select>
-                                <label for="sms_notifications">SMS Notifications</label>
-                                <select name="sms_notifications" class="form-control-setting">
-                                    <option value="on">On</option>
-                                    <option value="off">Off</option>
-                                </select>
-                                <label for="inapp_notifications">In-App Notifications</label>
-                                <select name="inapp_notifications" class="form-control-setting">
-                                    <option value="on">On</option>
-                                    <option value="off">Off</option>
-                                </select>
-                                <button class="btn mt-3" type="submit">Save Settings</button>
-                            </form>
+            </main>   
+            <footer class="py-4 bg-light mt-auto">
+                    <div class="container-fluid px-4">
+                        <div class="d-flex align-items-center justify-content-between small">
+                            <div class="text-muted"> &copy; 2024 Calendify. All rights reserved</div>
+                            <div>
+                                <a href="#">Privacy Policy</a>
+                                    &middot;
+                                <a href="#">Terms &amp; Conditions</a>
+                            </div>
                         </div>
                     </div>
-                </div>
+            </footer>      
+        </div>
     </div>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>    <script src="js/scripts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>       <script src="assets/demo/chart-area-demo.js"></script>
+    <script src="assets/demo/chart-bar-demo.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+    <script src="js/datatables-simple-demo.js"></script>
 </body>
 </html>
-
-   <!-- Popup for 'Settings Saved Successfully' -->
-   <?php if (isset($_GET['status']) && $_GET['status'] == 'success'): ?>
-            <div class="popup-success">
-                Settings saved successfully!
-            </div>
-    <?php endif; ?>
+<!-- Success Popup -->
+<?php if (isset($_GET['status']) && $_GET['status'] == 'success'): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="  position: fixed;
+                top: 20px; /* Adjust to set distance from top */
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 1050; /* Ensures it appears above other content */
+                width: 50%; /* Adjust width as needed */
+                text-align: center;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        Settings Saved Successfully!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>

@@ -254,24 +254,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
             </footer>
         </div>
-    </div>                                    
-    <!-- Success Modal -->
-    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="successModalLabel">Success</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Task and subtasks updated successfully!
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="redirectToTask()">Go to Task Page</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    </div>                                   
 
         <script>
             function addSubtask() {
