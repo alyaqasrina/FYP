@@ -625,6 +625,117 @@ progress {
   color: #6c757d;
 }
 
+/* Calendar Main Content */
+.container-fluid {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+/* Calendar Container */
+.calendar-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.month {
+  width: calc(33.333% - 20px);
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.month h3 {
+  font-size: 1.2rem;
+  color: #6f42c1;
+  margin-bottom: 10px;
+}
+
+/* Task Styling */
+.task {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  transition: all 0.3s ease-in-out;
+}
+
+.task h5 {
+  font-size: 1.2rem;
+  color: #0d6efd;
+  margin-bottom: 5px;
+}
+
+.task p {
+  margin: 5px 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.task:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navigation-buttons {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.navigation-buttons .btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  margin: 0 10px;
+  background-color: #6f42c1;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.navigation-buttons .btn:hover {
+  background-color: #6f42c1;
+  text-decoration: none;
+  color: white;
+}
+
+/* Reminder Container */
+.reminder-container{
+  background-color: #f8f9fa;
+  max-width: 600px;
+  margin: 0 auto;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+
+.form-select,
+.form-control{
+  max-width: 600px;
+  width: auto;
+  justify-content: center;
+  display: flex;
+}
+
+/* Add spacing for labels and checkboxes */
+.form-group-custom {
+  margin-bottom: 1.5rem;
+}
+
+/* Custom Days Checkboxes */
+.d-flex.flex-wrap {
+  gap: 10px;
+}
+
 .add-task-container,
 .edit-task-container,
 .settings-container {
@@ -660,17 +771,6 @@ progress {
       width: 100%; /* Adjust width to fit smaller screens */
       margin-bottom: 20px; /* Add spacing between stacked forms */
   }
-}
-
-.popup-center-top {
-  position: fixed;
-  top: 20px; /* Adjust to set distance from top */
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1050; /* Ensures it appears above other content */
-  width: 50%; /* Adjust width as needed */
-  text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .container,

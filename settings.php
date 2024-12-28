@@ -94,7 +94,7 @@ $notification_method = isset($_POST['notification_method']) ? $_POST['notificati
                         <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
                                 <a class="nav-link" href="settings.php">Profile & Notifications</a>
-                                <a class="nav-link" href="send_reminder.php">Send Reminder</a>
+                                <a class="nav-link" href="reminders.php">Send Reminder</a>
                             </nav>
                         </div>
                     </div>
