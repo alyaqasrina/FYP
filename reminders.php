@@ -124,71 +124,76 @@ unset($_SESSION['success'], $_SESSION['error']);
                     <div class="col-xl-3 col-md-6"></div>
                     <form action="save_reminder.php" method="POST">
                         <div class="reminder-container">
+                            <div class="reminder-form">
+                                <!-- Reminder Frequency -->
+                                <div class="mb-3 form-group">
+                                    <input type="text" class="form-control" id="reminder_name" name="reminder_name" required>
+                                    <label for="reminder_name" class="form-label">Reminder Text</label>
+                                </div>
+                                <div class="mb-3 form-group">
+                                    <select class="form-select" id="frequency" name="frequency" required>
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                    <label for="frequency" class="form-label">Reminder Frequency</label>
+                                </div>
 
-                            <!-- Reminder Frequency -->
-                            <div class="form-floating mb-3 form-group-custom">
-                                <select class="form-select" id="frequency" name="frequency" required>
-                                    <option value="daily">Daily</option>
-                                    <option value="weekly">Weekly</option>
-                                    <option value="custom">Custom</option>
-                                </select>
-                                <label for="frequency" class="form-label">Reminder Frequency</label>
-                            </div>
+                                <div class="mb-3 form-group">
+                                    <input type="time" class="form-control" id="time" name="time" required>
+                                    <label for="time" class="form-label">Reminder Time</label>
+                                </div>
 
-                            <div class="form-floating mb-3 form-group-custom">
-                                <input type="time" class="form-control" id="time" name="time" required>
-                                <label for="time" class="form-label">Reminder Time</label>
-                            </div>
+                                <div class="mb-3 form-group" id="custom-fields">
+                                    <label class="form-label mb-2" style="font-weight: 500;">Custom Days (Select days)</label><br>
+                                    <div class="d-flex flex-wrap gap-3"></div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="custom_days[]" value="Monday">
+                                        <label class="form-check-label">Monday</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="custom_days[]" value="Tuesday">
+                                        <label class="form-check-label">Tuesday</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="custom_days[]" value="Wednesday">
+                                        <label class="form-check-label">Wednesday</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="custom_days[]" value="Thursday">
+                                        <label class="form-check-label">Thursday</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="custom_days[]" value="Friday">
+                                        <label class="form-check-label">Friday</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="custom_days[]" value="Saturday">
+                                        <label class="form-check-label">Saturday</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="custom_days[]" value="Sunday">
+                                        <label class="form-check-label">Sunday</label>
+                                    </div>
+                                </div>
 
-                            <div class="mb-3 form-group-custom" id="custom-fields">
-                                <label class="form-label mb-2" style="font-weight: 500;">Custom Days (Select days)</label><br>
-                                <div class="d-flex flex-wrap gap-3"></div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" name="custom_days[]" value="Monday">
-                                    <label class="form-check-label">Monday</label>
+                                <!-- Custom Date (Optional) -->
+                                <div class="mb-3 form-group">
+                                    <input type="date" class="form-control" id="custom_date" name="custom_date">
+                                    <label for="custom_date" class="form-label">Custom Date (Optional)</label>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" name="custom_days[]" value="Tuesday">
-                                    <label class="form-check-label">Tuesday</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" name="custom_days[]" value="Wednesday">
-                                    <label class="form-check-label">Wednesday</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" name="custom_days[]" value="Thursday">
-                                    <label class="form-check-label">Thursday</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" name="custom_days[]" value="Friday">
-                                    <label class="form-check-label">Friday</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" name="custom_days[]" value="Saturday">
-                                    <label class="form-check-label">Saturday</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" name="custom_days[]" value="Sunday">
-                                    <label class="form-check-label">Sunday</label>
-                                </div>
-                            </div>
 
-                            <!-- Custom Date (Optional) -->
-                            <div class="form-floating mb-3 form-group-custom">
-                                <input type="date" class="form-control" id="custom_date" name="custom_date">
-                                <label for="custom_date" class="form-label">Custom Date (Optional)</label>
+                                <!-- Reminder Method -->
+                                <div class="mb-3 form-group">
+                                    <select class="form-select " id="notification_method" name="notification_method" required>
+                                        <option value="email">Email</option>
+                                        <option value="SMS">SMS</option>
+                                        <option value="in-app">In-app</option>
+                                    </select>
+                                    <label for="notification_method" class="form-label">Notification Method</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-30">Save Reminder</button>
                             </div>
-
-                            <!-- Reminder Method -->
-                            <div class="form-floating mb-3 form-group-custom">
-                                <select class="form-select " id="notification_method" name="notification_method" required>
-                                    <option value="email">Email</option>
-                                    <option value="WhatsApp">WhatsApp</option>
-                                    <option value="in-app">In-app</option>
-                                </select>
-                                <label for="notification_method" class="form-label">Notification Method</label>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-30">Save Reminder</button>
                         </div>
                     </form>
                 </div>

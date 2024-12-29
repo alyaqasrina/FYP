@@ -708,37 +708,12 @@ progress {
 }
 
 /* Reminder Container */
-.reminder-container{
-  background-color: #f8f9fa;
-  max-width: 600px;
-  margin: 0 auto;
-  border-radius: 10px;
-  align-items: center;
-  justify-content: center;
-  display: flex;
-}
 
-.form-select,
-.form-control{
-  max-width: 600px;
-  width: auto;
-  justify-content: center;
-  display: flex;
-}
-
-/* Add spacing for labels and checkboxes */
-.form-group-custom {
-  margin-bottom: 1.5rem;
-}
-
-/* Custom Days Checkboxes */
-.d-flex.flex-wrap {
-  gap: 10px;
-}
 
 .add-task-container,
 .edit-task-container,
-.settings-container {
+.settings-container,
+.reminder-container {
   padding: 20px;
   background-color: #f5f5f5;
   display: flex;

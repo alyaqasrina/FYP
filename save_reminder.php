@@ -1,17 +1,22 @@
 
 <?php
 session_start();
+include 'db.php';
 
-// Database connection
-$connection = mysqli_connect("localhost", "root", "", "fyp");
+// Check user session
+if (!isset($_SESSION['user_id'])) {
+    $_SESSION['error'] = "User not logged in!";
+    header("Location: login.php");
+    exit();
+}
 
-// Check if the form is submitted
+$user_id = $_SESSION['user_id'];
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $frequency = $_POST['frequency'];
     $time = $_POST['time'];
     $notification_method = $_POST['notification_method'];
 
-    // Handle custom frequency options
     if ($frequency == 'custom') {
         $custom_days = isset($_POST['custom_days']) ? implode(', ', $_POST['custom_days']) : 'None';
         $custom_date = $_POST['custom_date'] ?? 'N/A';
@@ -20,19 +25,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $custom_date = 'N/A';
     }
 
-    // Insert reminder into the database
-    $query = "INSERT INTO reminders (frequency, time, notification_method, custom_days, custom_date) VALUES ('$frequency', '$time', '$notification_method', '$custom_days', '$custom_date')";
-    
-    if (mysqli_query($connection, $query)) {
+    // Insert reminder
+    $query = "INSERT INTO reminders (user_id, frequency, time, notification_method, custom_days, custom_date) 
+              VALUES ('$user_id', '$frequency', '$time', '$notification_method', '$custom_days', '$custom_date')";
+
+    if (mysqli_query($conn, $query)) {
         $_SESSION['success'] = "Reminder saved successfully!";
     } else {
-        $_SESSION['error'] = "Failed to save reminder: " . mysqli_error($connection);
+        $_SESSION['error'] = "Failed to save reminder: " . mysqli_error($conn);
     }
 
-    // Close the database connection
-    mysqli_close($connection);
-
-    // Redirect back to the reminders.php page
+    mysqli_close($conn);
     header("Location: reminders.php");
     exit();
 }
@@ -52,13 +55,13 @@ try {
     $mail->isSMTP();
     $mail->Host = 'smtp.example.com';  // Set your SMTP server
     $mail->SMTPAuth = true;
-    $mail->Username = 'your-email@example.com'; // Set your SMTP username
-    $mail->Password = 'your-email-password';   // Set your SMTP password
+    $mail->Username = 'nqasrinazuraimi@gmail.com'; // Set your SMTP username
+    $mail->Password = '_Manurios1';   // Set your SMTP password
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port = 587;
 
     //Recipients
-    $mail->setFrom('your-email@example.com', 'Calendify');
+    $mail->setFrom('nqasrinazuraimi@gmail.com', 'Calendify');
     $mail->addAddress($user_email);     // Add user's registered email
 
     // Content
@@ -79,25 +82,25 @@ use Twilio\Rest\Client;
 // Collect form data
 $userPhoneNumber = $_POST['phone_number'];  // Get the user's phone number from the form
 $notificationMethod = $_POST['notification_method'];  // Get the notification method (e.g., 'WhatsApp')
-$reminderText = $_POST['reminder_text'];  // Get the reminder text
-$reminderTime = $_POST['reminder_time'];  // Get the reminder time
+$reminderText = $_POST['reminder_name'];  // Get the reminder text
+$reminderTime = $_POST['time'];  // Get the reminder time
 
 // Twilio credentials
-$sid = 'YOUR_TWILIO_ACCOUNT_SID';  // Replace with your Twilio SID
-$token = 'YOUR_TWILIO_AUTH_TOKEN';  // Replace with your Twilio Auth Token
+$sid = 'AC5d21e2c21d86b3a14f463519c64534c6';  // Replace with your Twilio SID
+$token = '78e967f576d585b9399e3c7eecbba839';  // Replace with your Twilio Auth Token
 $twilio = new Client($sid, $token);
 
 // Send WhatsApp notification if selected
-if ($notificationMethod == 'WhatsApp') {
+if ($notificationMethod == 'SMS') {
     try {
         $message = $twilio->messages->create(
-            'whatsapp:+' . $userPhoneNumber,  // User’s WhatsApp number
+            'SMS:+' . $userPhoneNumber,  // User’s WhatsApp number
             [
-                'from' => 'whatsapp:+14155238886',  // Your Twilio WhatsApp number
+                'from' => 'SMS:+12316362611',  // Your Twilio WhatsApp number
                 'body' => "Reminder: $reminderText at $reminderTime"
             ]
         );
-        echo "WhatsApp message sent successfully!";
+        echo "SMS message sent successfully!";
     } catch (Exception $e) {
         echo "Error: " . $e->getMessage();
     }
@@ -109,12 +112,12 @@ echo "Reminder saved successfully!";
 
 
 // Fetch upcoming reminders from the database
-$query = "SELECT * FROM reminders WHERE user_id = $user_id AND reminder_time > NOW()";
+$query = "SELECT * FROM reminders WHERE user_id = $user_id AND time > NOW()";
 $result = mysqli_query($conn, $query);
 
 while ($row = mysqli_fetch_assoc($result)) {
     echo "<div class='notification'>";
-    echo "Reminder: " . $row['reminder_title'] . " is scheduled for " . $row['reminder_time'];
+    echo "Reminder: " . $row['reminder_name'] . " is scheduled for " . $row['reminder_time'];
     echo "</div>";
 }
 
@@ -123,7 +126,7 @@ $notification_method = $_POST['notification_method'];
 
 if ($notification_method == 'Email') {
     // Call Email function
-} elseif ($notification_method == 'WhatsApp') {
+} elseif ($notification_method == 'SMS') {
     // Call WhatsApp function
 } elseif ($notification_method == 'In-App') {
     // No need to do anything extra, the reminder will be saved in the database and shown in-app
@@ -134,7 +137,7 @@ function sendEmailReminder($userEmail, $reminderTime) {
     // Add your email sending logic using PHPMailer here
 }
 
-function sendWhatsAppReminder($userPhoneNumber, $reminderTime) {
-    // Add your Twilio WhatsApp API logic here
+function sendSMSReminder($userPhoneNumber, $reminderTime) {
+    // Add your Twilio SMS API logic here
 }
 
