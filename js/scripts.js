@@ -24,3 +24,9 @@ window.addEventListener('DOMContentLoaded', event => {
     }
 
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const taskTable = new simpleDatatables.DataTable("#datatablesTasks");
+    const subtaskTable = new simpleDatatables.DataTable("#datatablesSubtasks");
+});
+

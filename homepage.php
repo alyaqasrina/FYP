@@ -149,7 +149,7 @@ $user = mysqli_fetch_assoc($result);
                                 Task List 
                             </div>
                             <div class="card-body">
-                                <table id="datatablesSimple">
+                                <table id="datatablesSimple" class="datatable-table">
                                     <thead>
                                         <tr>
                                             <th>Name</th>

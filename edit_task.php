@@ -203,6 +203,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         </select>
                                         <label for="priority">Priority:</label>
                                     </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="text" name="status" class="form-control" value="<?= htmlspecialchars($task['status']) ?>" required>
+                                        <label for="status">Task Status:</label>
+                                    </div>
                                 </div>
 
                                 <div class="subtask-form">
@@ -229,7 +233,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                             </select>
                                             <label>Priority:</label>
                                         </div>
-                                        <?php endforeach; ?>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" name="subtask_status[]"class="form-control" value="<?= htmlspecialchars($subtask['subtask_status']) ?>" required>
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
                                 <div class="main-buttons">
                                     <button type="button" class="btn btn-primary" onclick="addSubtask()">Add Subtask</button>
