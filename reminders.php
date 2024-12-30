@@ -187,7 +187,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                                 <div class="mb-3 form-group">
                                     <select class="form-select " id="notification_method" name="notification_method" required>
                                         <option value="email">Email</option>
-                                        <option value="SMS">SMS</option>
+                                        <option value="WhatsApp">Whatsapp</option>
                                         <option value="in-app">In-app</option>
                                     </select>
                                     <label for="notification_method" class="form-label">Notification Method</label>

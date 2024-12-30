@@ -91,16 +91,16 @@ $token = '78e967f576d585b9399e3c7eecbba839';  // Replace with your Twilio Auth T
 $twilio = new Client($sid, $token);
 
 // Send WhatsApp notification if selected
-if ($notificationMethod == 'SMS') {
+if ($notificationMethod == 'WhatsApp') {
     try {
         $message = $twilio->messages->create(
-            'SMS:+' . $userPhoneNumber,  // User’s WhatsApp number
+            'WhatsApp:+' . $userPhoneNumber,  // User’s WhatsApp number
             [
                 'from' => 'SMS:+12316362611',  // Your Twilio WhatsApp number
                 'body' => "Reminder: $reminderText at $reminderTime"
             ]
         );
-        echo "SMS message sent successfully!";
+        echo "WhatsApp message sent successfully!";
     } catch (Exception $e) {
         echo "Error: " . $e->getMessage();
     }

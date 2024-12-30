@@ -766,6 +766,8 @@ progress {
 .card {
   width: 100%;
   padding: 20px;
+  border: 1px solid;
+  border-color: #ddd; /* Soft gray */
 }
 
 @media (max-width: 768px) {
@@ -11140,6 +11142,7 @@ body {
 
 .sb-sidenav-dark {
   background-color: #4e3b84;
+  background: linear-gradient(180deg, #4e3b84, #3c306a);
   color: rgba(192, 192, 192, 1);
 }
 .sb-sidenav-dark .sb-sidenav-menu .sb-sidenav-menu-heading {
