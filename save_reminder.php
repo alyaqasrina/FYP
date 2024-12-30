@@ -126,7 +126,7 @@ $notification_method = $_POST['notification_method'];
 
 if ($notification_method == 'Email') {
     // Call Email function
-} elseif ($notification_method == 'SMS') {
+} elseif ($notification_method == 'WhatsApp') {
     // Call WhatsApp function
 } elseif ($notification_method == 'In-App') {
     // No need to do anything extra, the reminder will be saved in the database and shown in-app
