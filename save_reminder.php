@@ -61,7 +61,7 @@ try {
     $mail->Port = 587;
 
     //Recipients
-    $mail->setFrom('nqasrinazuraimi@gmail.com', 'Calendify');
+    $mail->setFrom('@gmail.com', 'Calendify');
     $mail->addAddress($user_email);     // Add user's registered email
 
     // Content
