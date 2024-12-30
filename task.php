@@ -134,7 +134,6 @@
                                             <th>Name</th>
                                             <th>Task Due Date</th>
                                             <th>Subtask </th>
-                                            <th>Subtask Due Date</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -158,18 +157,33 @@
                                             $result = mysqli_query($conn, $query);
                                             $tasks = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-                                            // Display the tasks in the table
-                                            foreach ($tasks as $task) {
-                                                echo '<tr>';
-                                                echo '<td>' . $task['task_name'] . '</td>';
-                                                echo '<td>' . $task['task_due_date'] . '</td>';
-                                                echo '<td>' . $task['subtask_name'] . '</td>';
-                                                echo '<td>' . $task['subtask_due_date'] . '</td>';
-                                                echo '<td><a href="edit_task.php?task_id=' . $task['task_id'] . '">Edit</a></td>';
-                                                echo '<td><a href="delete_task.php?task_id=' . $task['task_id'] . '">Delete</a></td>';
-                                                echo '</tr>';
-                                            }
-                                            
+                                                // Display the tasks in the table
+                                                foreach ($tasks as $task) {
+                                                    // Group subtasks for the current task
+                                                    $subtasks = array_filter($tasks, function ($t) use ($task) {
+                                                        return $t['task_id'] === $task['task_id'];
+                                                    });
+
+                                                    // Skip tasks that have already been displayed (to avoid duplicates)
+                                                    if (!isset($displayed_tasks[$task['task_id']])) {
+                                                        $displayed_tasks[$task['task_id']] = true;
+
+                                                        // Create a list of subtasks
+                                                        $subtask_details = '<ul>';
+                                                        foreach ($subtasks as $subtask) {
+                                                            $subtask_details .= '<li>' . $subtask['subtask_name'] . ' (Due: ' . $subtask['subtask_due_date'] . ')</li>';
+                                                        }
+                                                        $subtask_details .= '</ul>'; // Close the list
+
+                                                        echo '<tr>';
+                                                        echo '<td>' . $task['task_name'] . '</td>';
+                                                        echo '<td>' . $task['task_due_date'] . '</td>';
+                                                        echo '<td>' . $subtask_details . '</td>'; // Subtasks displayed as a list
+                                                        echo '<td><a href="edit_task.php?task_id=' . $task['task_id'] . '">Edit</a></td>';
+                                                        echo '<td><a href="delete_task.php?task_id=' . $task['task_id'] . '">Delete</a></td>';
+                                                        echo '</tr>';
+                                                    }
+                                                }
                                         ?>
                                         </tr>
                                     </tbody>
