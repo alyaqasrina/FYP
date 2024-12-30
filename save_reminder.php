@@ -55,8 +55,8 @@ try {
     $mail->isSMTP();
     $mail->Host = 'smtp.example.com';  // Set your SMTP server
     $mail->SMTPAuth = true;
-    $mail->Username = 'nqasrinazuraimi@gmail.com'; // Set your SMTP username
-    $mail->Password = '_Manurios1';   // Set your SMTP password
+    $mail->Username = '@gmail.com'; // Set your SMTP username
+    $mail->Password = '';   // Set your SMTP password
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port = 587;
 
@@ -86,8 +86,8 @@ $reminderText = $_POST['reminder_name'];  // Get the reminder text
 $reminderTime = $_POST['time'];  // Get the reminder time
 
 // Twilio credentials
-$sid = 'AC5d21e2c21d86b3a14f463519c64534c6';  // Replace with your Twilio SID
-$token = '78e967f576d585b9399e3c7eecbba839';  // Replace with your Twilio Auth Token
+$sid = '';  // Replace with your Twilio SID
+$token = '';  // Replace with your Twilio Auth Token
 $twilio = new Client($sid, $token);
 
 // Send WhatsApp notification if selected
