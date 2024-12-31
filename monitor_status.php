@@ -112,7 +112,7 @@ $user = mysqli_fetch_assoc($result);
                             Task Status
                         </div>
                         <div class="card-body">
-                            <table id="datatablesSimple">
+                            <table id="datatablesSimple" class="datatable-table">
                                 <thead>
                                     <tr>
                                         <th>Task</th>
@@ -135,6 +135,7 @@ $user = mysqli_fetch_assoc($result);
                                         echo "<td>" . $row['due_date'] . "</td>";
                                         echo "<td>" . $row['priority'] . "</td>";
                                         echo "<td>" . $row['status'] . "</td>";
+                                        echo "<td>" . $row['progress'] . "% Complete</td>";
                                         echo "</tr>";
                                     }
                                     ?>
@@ -149,7 +150,7 @@ $user = mysqli_fetch_assoc($result);
                             Subtask Status
                         </div>
                         <div class="card-body">
-                            <table id="datatablesSubtask" class="datatable-table">
+                            <table id="datatablesSimple" class="datatable-table">
                                 <thead>
                                     <tr>
                                         <th>Subtask</th>

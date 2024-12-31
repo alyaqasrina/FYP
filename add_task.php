@@ -29,12 +29,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $task_description = mysqli_real_escape_string($conn, $_POST['description']);
     $due_date = mysqli_real_escape_string($conn, $_POST['due_date']);
     $priority = mysqli_real_escape_string($conn, $_POST['priority']);
+    $estimated_time = mysqli_real_escape_string($conn, $_POST['estimated_time']);
+    $complexity = mysqli_real_escape_string($conn, $_POST['complexity']);
 
     // Insert main task into the database
-    $query = "INSERT INTO `tasks` (task_name, description, due_date, priority, user_id) 
+    $query = "INSERT INTO `tasks` (task_name, description, due_date, priority, estimated_time, complexity,  user_id) 
               VALUES (?, ?, ?, ?, ?)";
     $stmt = mysqli_prepare($conn, $query);
-    mysqli_stmt_bind_param($stmt, "ssssi", $task_name, $task_description, $due_date, $priority, $user_id);
+    mysqli_stmt_bind_param($stmt, "ssssi", $task_name, $task_description, $due_date, $priority, $estimated_time, $complexity, $user_id);
     
     if (mysqli_stmt_execute($stmt)) {
         $task_id = mysqli_insert_id($conn); // Get the inserted task's ID
@@ -184,8 +186,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 </div>
 
                                 <div class="form-floating mb-3"> 
-                                    <input type="text" name="task_desc" class="form-control" id="inputTaskDesc" name="taskDesc" required>
-                                    <label for="task_description">Task Description:</label>
+                                    <input type="text" name="description" class="form-control" id="inputTaskDesc" name="taskDesc" required>
+                                    <label for="description">Task Description:</label>
                                 </div>
 
                                 <div class="form-floating mb-3"> 
@@ -200,6 +202,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         <option value="High">High</option>
                                     </select>
                                     <label for="priority" class="task-priority">Priority:</label>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input type="int" name="estimated_time" class="form-control" id="inputEstimatedTime" name="estimatedTime" required>
+                                    <label for="estimated_time">Estimated Time to Complete:</label>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input type="complexity" name="complexity" class="form-control" id="inputComplexity" name="complexity" required>
+                                    <label for="complexity">Complexity Level (1-5):</label>
                                 </div>
                             </div>
                             

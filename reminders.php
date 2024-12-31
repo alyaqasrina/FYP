@@ -23,6 +23,7 @@ $error = isset($_SESSION['error']) ? $_SESSION['error'] : null;
 
 // Clear messages after displaying them
 unset($_SESSION['success'], $_SESSION['error']);
+
 ?>
 
 <!DOCTYPE html>

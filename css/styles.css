@@ -626,12 +626,6 @@ progress {
 }
 
 /* Calendar Main Content */
-.container-fluid {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
 
 /* Calendar Container */
 .calendar-container {
@@ -707,9 +701,111 @@ progress {
   color: white;
 }
 
-/* Reminder Container */
+/* delete task */
+.delete-task-container {
+  padding: 20px;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 
+.delete-task-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
 
+.delete-task-header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #dc3545;
+}
+
+.task-section {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.task-box {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.task-box h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.task-box p {
+  margin-bottom: 10px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.task-box ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.task-box ul li {
+  margin-bottom: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.task-box ul li strong {
+  color: #333;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.form-buttons button,
+.form-buttons a {
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  color: #fff;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: #fff;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  color: #fff;
+}
+
+/* Add Task Form */
 .add-task-container,
 .edit-task-container,
 .settings-container,

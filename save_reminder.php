@@ -2,6 +2,7 @@
 <?php
 session_start();
 include 'db.php';
+require_once 'priority_utils.php';
 
 // Check user session
 if (!isset($_SESSION['user_id'])) {
@@ -24,7 +25,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $custom_days = 'N/A';
         $custom_date = 'N/A';
     }
-
     // Insert reminder
     $query = "INSERT INTO reminders (user_id, frequency, time, notification_method, custom_days, custom_date) 
               VALUES ('$user_id', '$frequency', '$time', '$notification_method', '$custom_days', '$custom_date')";
@@ -38,7 +38,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     mysqli_close($conn);
     header("Location: reminders.php");
     exit();
+
 }
+
+// Notify user about the top-priority task
+$tasks = getSortedTasks($connection, date('Y-m-d'));
+if (!empty($tasks)) {
+    $topTask = $tasks[0];
+    echo "Reminder: Your top priority task for today is: " . $topTask['title'];
 
 // Include PHPMailer classes
 use PHPMailer\PHPMailer\PHPMailer;
