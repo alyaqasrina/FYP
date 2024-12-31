@@ -29,41 +29,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $task_description = mysqli_real_escape_string($conn, $_POST['description']);
     $due_date = mysqli_real_escape_string($conn, $_POST['due_date']);
     $priority = mysqli_real_escape_string($conn, $_POST['priority']);
-    $estimated_time = mysqli_real_escape_string($conn, $_POST['estimated_time']);
     $complexity = mysqli_real_escape_string($conn, $_POST['complexity']);
 
     // Insert main task into the database
-    $query = "INSERT INTO `tasks` (task_name, description, due_date, priority, estimated_time, complexity,  user_id) 
-              VALUES (?, ?, ?, ?, ?)";
+    $query = "INSERT INTO `tasks` (task_name, description, due_date, priority, complexity, user_id) 
+              VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = mysqli_prepare($conn, $query);
-    mysqli_stmt_bind_param($stmt, "ssssi", $task_name, $task_description, $due_date, $priority, $estimated_time, $complexity, $user_id);
-    
+    mysqli_stmt_bind_param($stmt, "sssisi", $task_name, $task_description, $due_date, $priority, $complexity, $user_id);
+
     if (mysqli_stmt_execute($stmt)) {
         $task_id = mysqli_insert_id($conn); // Get the inserted task's ID
 
-        // Handle subtasks if provided
-        if (!empty($_POST['subtask_name'])) {
-            $subtask_names = $_POST['subtask_name'];
-            $subtask_due_dates = $_POST['subtask_due_date'];
-            $subtask_priority = $_POST['subtask_priority'];
+        if (!empty($_POST['subtask_name']) && !empty($_POST['subtask_due_date']) && !empty($_POST['subtask_priority'])) {
+            // Filter out empty entries in subtask arrays
+            $subtask_names = array_filter($_POST['subtask_name']);
+            $subtask_due_dates = array_filter($_POST['subtask_due_date']);
+            $subtask_priorities = array_filter($_POST['subtask_priority']);
         
-            $subtask_query = "INSERT INTO `subtasks` (task_id, subtask_name, subtask_due_date, subtask_priority) 
-                              VALUES (?, ?, ?, ?)";
+            // Ensure all arrays have the same number of elements
+            if (count($subtask_names) !== count($subtask_due_dates) || count($subtask_due_dates) !== count($subtask_priorities)) {
+                die("Error: Mismatch in the number of subtask fields provided.");
+            }
+        
+            $subtask_query = "INSERT INTO `subtasks` (task_id, subtask_name, subtask_due_date, subtask_priority) VALUES (?, ?, ?, ?)";
             $subtask_stmt = mysqli_prepare($conn, $subtask_query);
         
             foreach ($subtask_names as $index => $subtask_name) {
-                $subtask_name = mysqli_real_escape_string($conn, $subtask_name);
-                $subtask_due_date = mysqli_real_escape_string($conn, $subtask_due_dates[$index]);
-                $subtask_priority = mysqli_real_escape_string($conn, $subtask_priority[$index]);
-        
-                if (empty($subtask_name) || empty($subtask_due_date) || empty($subtask_priority)) {
+                if (empty($subtask_names[$index]) || empty($subtask_due_dates[$index]) || empty($subtask_priorities[$index])) {
                     die("Error: All subtask fields are required.");
                 }
         
+                $subtask_name = mysqli_real_escape_string($conn, $subtask_name);
+                $subtask_due_date = mysqli_real_escape_string($conn, $subtask_due_dates[$index]);
+                $subtask_priority = mysqli_real_escape_string($conn, $subtask_priorities[$index]);
+        
                 mysqli_stmt_bind_param($subtask_stmt, "isss", $task_id, $subtask_name, $subtask_due_date, $subtask_priority);
-                mysqli_stmt_execute($subtask_stmt);
+                if (!mysqli_stmt_execute($subtask_stmt)) {
+                    die("Error inserting subtask: " . mysqli_stmt_error($subtask_stmt));
+                }
             }
-        }
+            mysqli_stmt_close($subtask_stmt);
+        } else {
+            die("Error: Subtasks not properly submitted.");
+        }        
+    }
         
         // Display the main task and subtasks
         echo "<h2>Task Added:</h2>";
@@ -205,11 +214,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 </div>
 
                                 <div class="form-floating mb-3">
-                                    <input type="int" name="estimated_time" class="form-control" id="inputEstimatedTime" name="estimatedTime" required>
-                                    <label for="estimated_time">Estimated Time to Complete:</label>
-                                </div>
-
-                                <div class="form-floating mb-3">
                                     <input type="complexity" name="complexity" class="form-control" id="inputComplexity" name="complexity" required>
                                     <label for="complexity">Complexity Level (1-5):</label>
                                 </div>
@@ -241,7 +245,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </div>
                             <!-- Main Buttons (Visible initially) -->
                             <div class="main-buttons">
-                                <button type="button" class="btn btn-primary" onclick="addSubtask()">Add Another Subtask</button>
+                                <button type="button" class="btn btn-warning" onclick="addSubtask()">Add Another Subtask</button>
                                 <button type="submit" class="btn btn-primary">Save Task</button>
                             </div>
                             </div>
@@ -268,88 +272,87 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
     <script>
-        function addSubtask() {
-            const subtaskForm = document.querySelector('.subtask-form'); // The container for subtasks
+    function addSubtask() {
+        const subtaskForm = document.querySelector('.subtask-form'); // The container for subtasks
 
-            // Create a new subtask HTML structure dynamically
-            const newSubtask = document.createElement('div');
-            newSubtask.classList.add('subtask-group', 'mb-3'); // Add a class for styling if needed
+        // Create a new subtask HTML structure dynamically
+        const newSubtask = document.createElement('div');
+        newSubtask.classList.add('subtask-group', 'mb-3'); // Add a class for styling if needed
 
-            // Add input fields for the new subtask
-            newSubtask.innerHTML = `
-                <div class="form-floating mb-3"> 
-                    <input type="text" name="subtask_name[]" class="form-control" required>
-                    <label for="subtask_name">Subtask Name:</label>
-                </div>
-                <div class="form-floating mb-3"> 
-                    <input type="date" name="subtask_due_date[]" class="form-control" required>
-                    <label for="subtask_due_date">Due Date:</label>
-                </div>
-                <div class="form-floating mb-3"> 
-                    <select name="subtask_priority[]" class="form-control" required>
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
-                    </select>
-                    <label for="subtask_priority">Priority:</label>
-                </div>
-                <button type="button" class="btn btn-danger" onclick="removeSubtask(this)">Remove Subtask</button>
-                <button type="button" class="btn btn-primary" onclick="addSubtask()">Add Another Subtask</button>
-                <button type="submit" class="btn btn-primary">Save Task</button>
-            `;
+        // Add input fields for the new subtask
+        newSubtask.innerHTML = `
+            <div class="form-floating mb-3"> 
+                <input type="text" name="subtask_name[]" class="form-control" required>
+                <label for="subtask_name">Subtask Name:</label>
+            </div>
+            <div class="form-floating mb-3"> 
+                <input type="date" name="subtask_due_date[]" class="form-control" required>
+                <label for="subtask_due_date">Due Date:</label>
+            </div>
+            <div class="form-floating mb-3"> 
+                <select name="subtask_priority[]" class="form-control" required>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+                <label for="subtask_priority">Priority:</label>
+            </div>
+            <button type="button" class="btn btn-danger" onclick="removeSubtask(this)">Remove Subtask</button>
+            <button type="button" class="btn btn-warning add-subtask-btn" onclick="addSubtask()">Add Another Subtask</button>
+            <button type="submit" class="btn btn-primary save-task-btn">Save Task</button>
+        `;
 
-            // Append the new subtask form to the container
-            subtaskForm.appendChild(newSubtask);
+        // Append the new subtask form to the container
+        subtaskForm.appendChild(newSubtask);
 
-            // Update button visibility
-            toggleButtons();
-        }
+        // Update button visibility
+        updateButtonVisibility();
+    }
 
-        function removeSubtask(button) {
-            const subtaskGroup = button.parentElement; // Get the parent `.subtask-group` div
-            subtaskGroup.remove();
+    function removeSubtask(button) {
+        const subtaskGroup = button.parentElement; // Get the parent `.subtask-group` div
+        subtaskGroup.remove();
 
-            // Update button visibility
-            toggleButtons();
-        }
+        // Update button visibility
+        updateButtonVisibility();
+    }
 
-        function toggleButtons() {
-            const subtaskGroups = document.querySelectorAll('.subtask-group'); // Get all subtask groups
-            const mainButtons = document.querySelector('.main-buttons'); // Main buttons container
+    function updateButtonVisibility() {
+        const subtaskGroups = document.querySelectorAll('.subtask-group'); // Get all subtask groups
 
-            if (subtaskGroups.length === 0) {
-                // Show the main buttons if no subtasks exist
-                mainButtons.style.display = 'block';
+        subtaskGroups.forEach((group, index) => {
+            const removeButton = group.querySelector('.btn-danger');
+            const addButton = group.querySelector('.add-subtask-btn'); // "Add Another Subtask" button
+            const saveButton = group.querySelector('.save-task-btn'); // "Save Task" button
+
+            // Ensure only the last group shows its buttons
+            if (index === subtaskGroups.length - 1) {
+                if (removeButton) removeButton.style.display = 'inline-block';
+                if (addButton) addButton.style.display = 'inline-block';
+                if (saveButton) saveButton.style.display = 'inline-block';
             } else {
-                // Hide the main buttons if subtasks exist
-                mainButtons.style.display = 'none';
-
-            // Ensure only the last subtask group displays its buttons
-            subtaskGroups.forEach((group, index) => {
-                const addButton = group.querySelector('.btn-primary'); // Add Another Subtask button
-                const saveButton = group.querySelector('.btn-primary'); // Save Task button
-
-                if (index === subtaskGroups.length - 1) {
-                    // Show buttons for the last subtask group
-                    addButton.style.display = 'inline-block';
-                    saveButton.style.display = 'inline-block';
-                } else {
-                    // Hide buttons for all other subtask groups
-                    addButton.style.display = 'none';
-                    saveButton.style.display = 'none';
-                }
-            });
-        }
-
-            // Special case: Ensure first subtask always has buttons if it is the only one
-            if (subtaskGroups.length === 1) {
-                const firstGroup = subtaskGroups[0];
-                const addButton = firstGroup.querySelector('.btn-primary');
-                const saveButton = firstGroup.querySelector('.btn-primary');
-                addButton.style.display = 'inline-block';
-                saveButton.style.display = 'inline-block';
+                if (removeButton) removeButton.style.display = 'none';
+                if (addButton) addButton.style.display = 'none';
+                if (saveButton) saveButton.style.display = 'none';
             }
+        });
+
+        // Handle the first subtask group explicitly
+        if (subtaskGroups.length === 1) {
+            const firstGroup = subtaskGroups[0];
+            const removeButton = firstGroup.querySelector('.btn-danger');
+            const addButton = firstGroup.querySelector('.add-subtask-btn');
+            const saveButton = firstGroup.querySelector('.save-task-btn');
+
+            // Ensure buttons are visible if it's the only group
+            if (removeButton) removeButton.style.display = 'inline-block';
+            if (addButton) addButton.style.display = 'inline-block';
+            if (saveButton) saveButton.style.display = 'inline-block';
         }
+    }
+
+    // Ensure proper button visibility after page load (in case subtasks exist already)
+    document.addEventListener('DOMContentLoaded', updateButtonVisibility);
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>

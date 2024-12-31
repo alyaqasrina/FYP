@@ -1,7 +1,6 @@
 <?php
 session_start();
 include('db.php');
-include('priortize_task.php');
 
 if (!isset($_SESSION['username'])) {
     header('Location: login.php');
@@ -22,35 +21,6 @@ mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
-$prioritizedTasks = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    // Scoring parameters
-    $priorityLevelScores = ['Low' => 1, 'Medium' => 2, 'High' => 3];
-    $priorityLevelWeight = 5;
-    $dueTimeWeight = 3;
-
-    // Calculate priority level score
-    $priorityScore = $priorityLevelScores[$row['priority_level']] ?? 0;
-
-    // Calculate due time score
-    $dueTime = strtotime($row['due_time']);
-    $currentTime = time();
-    $endOfDay = strtotime('23:59:59');
-    $dueTimeScore = 10 - (($dueTime - $currentTime) / ($endOfDay - $currentTime)) * 10;
-
-    // Calculate total score
-    $totalScore = ($priorityLevelWeight * $priorityScore) +
-                  ($dueTimeWeight * $dueTimeScore);
-
-    // Add task to prioritized list
-    $row['total_score'] = $totalScore;
-    $prioritizedTasks[] = $row;
-}
-
-// Sort tasks by total score in descending order
-usort($prioritizedTasks, function ($a, $b) {
-    return $b['total_score'] <=> $a['total_score'];
-});
 ?>
 
 <!DOCTYPE html>
@@ -185,26 +155,46 @@ usort($prioritizedTasks, function ($a, $b) {
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $query = "SELECT t.task_id, t.task_name, t.priority, t.due_date AS task_due_date, 
-                                                 s.subtask_name, s.subtask_due_date
-                                              FROM tasks t
-                                              LEFT JOIN subtasks s ON t.task_id = s.task_id";
-                                    $result = mysqli_query($conn, $query);
-                                    $tasks = mysqli_fetch_all($result, MYSQLI_ASSOC);
+                                        // Update SQL query to use GROUP_CONCAT for subtasks
+                                        $query = "SELECT 
+                                                    t.task_id, 
+                                                    t.task_name, 
+                                                    t.priority, 
+                                                    t.due_date AS task_due_date, 
+                                                    GROUP_CONCAT(CONCAT(s.subtask_name, ' (Due: ', s.subtask_due_date, ')') SEPARATOR '||') AS subtasks
+                                                FROM tasks t
+                                                LEFT JOIN subtasks s ON t.task_id = s.task_id
+                                                GROUP BY t.task_id";
 
-                                    foreach ($tasks as $task) {
-                                        echo '<tr>';
-                                        echo '<td>' . $task['task_name'] . '</td>';
-                                        echo '<td>' . $task['priority'] . '</td>';
-                                        echo '<td>' . $task['task_due_date'] . '</td>';
-                                        echo '<td>' . ($task['subtask_name'] ? $task['subtask_name'] . ' (Due: ' . $task['subtask_due_date'] . ')' : 'No subtasks') . '</td>';
-                                        echo '<td>
-                                                <a href="edit_task.php?task_id=' . $task['task_id'] . '" class="btn btn-primary btn-sm">Edit</a>
-                                                <a href="delete_task.php?task_id=' . $task['task_id'] . '" class="btn btn-danger btn-sm">Delete</a>
-                                              </td>';
-                                        echo '</tr>';
-                                    }
-                                    ?>
+                                        $result = mysqli_query($conn, $query);
+
+                                        $tasks = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+                                        foreach ($tasks as $task) {
+                                            echo '<tr>';
+                                            echo '<td>' . $task['task_name'] . '</td>';
+                                            echo '<td>' . $task['priority'] . '</td>';
+                                            echo '<td>' . $task['task_due_date'] . '</td>';
+
+                                            // Generate bullet list for subtasks
+                                            if ($task['subtasks']) {
+                                                $subtasks = explode('||', $task['subtasks']);
+                                                echo '<td><ul>';
+                                                foreach ($subtasks as $subtask) {
+                                                    echo '<li>' . $subtask . '</li>';
+                                                }
+                                                echo '</ul></td>';
+                                            } else {
+                                                echo '<td>No subtasks</td>';
+                                            }
+
+                                            echo '<td>
+                                                    <a href="edit_task.php?task_id=' . $task['task_id'] . '" class="btn btn-primary btn-sm">Edit</a>
+                                                    <a href="delete_task.php?task_id=' . $task['task_id'] . '" class="btn btn-danger btn-sm">Delete</a>
+                                                </td>';
+                                            echo '</tr>';
+                                        }
+                                        ?>
                                 </tbody>
                             </table>
                         </div>
