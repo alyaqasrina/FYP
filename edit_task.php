@@ -12,31 +12,32 @@ $user_id = $_SESSION['user_id'];
 // Retrieve task and subtasks data
 if (isset($_GET['task_id'])) {
     $task_id = intval($_GET['task_id']);
-    
-// Fetch main task details
-$task_query = "SELECT * FROM `tasks` WHERE `task_id` = ? AND `user_id` = ?";
-$stmt = mysqli_prepare($conn, $task_query);
-mysqli_stmt_bind_param($stmt, "ii", $task_id, $user_id);
-mysqli_stmt_execute($stmt);
-$task_result = mysqli_stmt_get_result($stmt);
-$task = mysqli_fetch_assoc($task_result);
+
+    // Fetch main task details
+    $task_query = "SELECT * FROM `tasks` WHERE `task_id` = ? AND `user_id` = ?";
+    $stmt = mysqli_prepare($conn, $task_query);
+    mysqli_stmt_bind_param($stmt, "ii", $task_id, $user_id);
+    mysqli_stmt_execute($stmt);
+    $task_result = mysqli_stmt_get_result($stmt);
+    $task = mysqli_fetch_assoc($task_result);
 
     if (!$task) {
         die("Error: Task not found or you do not have access to it.");
     }
-        // Fetch subtasks
-        $subtask_query = "SELECT * FROM `subtasks` WHERE `task_id` = ?";
-        $stmt = mysqli_prepare($conn, $subtask_query);
-        mysqli_stmt_bind_param($stmt, "i", $task_id);
-        mysqli_stmt_execute($stmt);
-        $subtasks_result = mysqli_stmt_get_result($stmt);
-        $subtasks = mysqli_fetch_all($subtasks_result, MYSQLI_ASSOC);
-    } else {
-        die("Error: Task ID is required.");
-    }
+    // Fetch subtasks
+    $subtask_query = "SELECT * FROM `subtasks` WHERE `task_id` = ?";
+    $stmt = mysqli_prepare($conn, $subtask_query);
+    mysqli_stmt_bind_param($stmt, "i", $task_id);
+    mysqli_stmt_execute($stmt);
+    $subtasks_result = mysqli_stmt_get_result($stmt);
+    $subtasks = mysqli_fetch_all($subtasks_result, MYSQLI_ASSOC);
+} else {
+    die("Error: Task ID is required.");
+}
 
 // Handle form submission for updates
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
     $task_name = mysqli_real_escape_string($conn, $_POST['task_name']);
     $task_description = mysqli_real_escape_string($conn, $_POST['description']);
     $due_date = mysqli_real_escape_string($conn, $_POST['due_date']);
@@ -81,7 +82,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     // JavaScript for Success Popup and Redirect
     echo "<script>
-    alert('Task and subtasks updated successfully!');
     window.location.href = 'task.php';
     </script>";
     exit;
@@ -90,6 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -100,7 +101,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
 </head>
+
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
@@ -124,7 +133,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                     <li><a class="dropdown-item" href="settings.php">Setting</a></li>
-                    <li><hr class="dropdown-divider" /></li>
+                    <li>
+                        <hr class="dropdown-divider" />
+                    </li>
                     <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                 </ul>
             </li>
@@ -136,7 +147,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                 <div class="sb-sidenav-menu">
                     <div class="nav">
-                        <div class="sb-sidenav-menu-heading"><Main></Main></div>
+                        <div class="sb-sidenav-menu-heading">
+                            <Main></Main>
+                        </div>
                         <a class="nav-link" href="homepage.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
@@ -158,33 +171,240 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <div class="sb-sidenav-footer">
                     <div class="small">Logged in as:</div>
-                        <?php 
-                            echo $_SESSION['username'];
-                        ?>
+                    <?php
+                    echo $_SESSION['username'];
+                    ?>
                 </div>
             </nav>
         </div>
 
         <div id="layoutSidenav_content">
             <main>
-                <div class="container-fluid px-4">
+                <form action="edit_task.php?task_id=<?= $task_id ?>" method="POST">
+                    <div id="app" v-cloak>
+                        <div class="container mx-auto p-4">
+                            <!-- Main Task Form -->
+                            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                                <h2 class="text-2xl font-bold mb-4">Edit Main Task</h2>
+                                <p class="text-gray-600 mb-4">Edit the details of the main task</p>
+
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Task Name:</label>
+                                        <input
+                                            v-model="mainTask.name"
+                                            type="text"
+                                            name="task_name"
+                                            class="w-full p-2 border rounded">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Task Description:</label>
+                                        <input
+                                            v-model="mainTask.description"
+                                            type="text"
+                                            name="description"
+                                            class="w-full p-2 border rounded">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Due Date:</label>
+                                        <input
+                                            v-model="mainTask.dueDate"
+                                            type="date"
+                                            name="due_date"
+                                            class="w-full p-2 border rounded">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Priority:</label>
+                                        <select
+                                            v-model="mainTask.priority"
+                                            name="priority"
+                                            class="w-full p-2 border rounded">
+                                            <option value="High">High</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Low">Low</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Task Status:</label>
+                                        <select
+                                            v-model="mainTask.status"
+                                            name="status"
+                                            class="w-full p-2 border rounded">
+                                            <option value="Pending">Pending</option>
+                                            <option value="In Progress">In Progress</option>
+                                            <option value="Completed">Completed</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Subtasks Section -->
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h2 class="text-2xl font-bold mb-4">Edit Subtasks</h2>
+                                <p class="text-gray-600 mb-4">Edit the details of the subtasks</p>
+
+                                <!-- Existing Subtasks -->
+                                <div v-for="(subtask, index) in subtasks" :key="index" class="mb-6 p-4 border rounded">
+                                    <h3 class="font-bold mb-4">Subtask {{ index + 1 }}</h3>
+
+                                    <div class="space-y-4">
+
+                                        <input
+                                            v-model="subtask.id"
+                                            type="hidden"
+                                            name="subtask_id[]">
+
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Subtask Name:</label>
+                                            <input
+                                                v-model="subtask.name"
+                                                name="subtask_name[]"
+                                                type="text"
+                                                class="w-full p-2 border rounded">
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Due Date:</label>
+                                            <input
+                                                v-model="subtask.dueDate"
+                                                type="date"
+                                                name="subtask_due_date[]"
+                                                class="w-full p-2 border rounded">
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Priority:</label>
+                                            <select
+                                                v-model="subtask.priority"
+                                                name="subtask_priority[]"
+                                                class="w-full p-2 border rounded">
+                                                <option value="High">High</option>
+                                                <option value="Medium">Medium</option>
+                                                <option value="Low">Low</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Status:</label>
+                                            <select
+                                                v-model="subtask.status"
+                                                name="subtask_status[]"
+                                                class="w-full p-2 border rounded">
+                                                <option value="Not Started">Not Started</option>
+                                                <option value="In Progress">In Progress</option>
+                                                <option value="Completed">Completed</option>
+                                            </select>
+                                        </div>
+
+                                        <button
+                                            @click="removeSubtask(index)"
+                                            class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                                            Remove Subtask
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Add Subtask and Save Changes Buttons -->
+                                <div class="flex gap-4">
+                                    <button
+                                        @click="addSubtask"
+                                        type="button"
+                                        class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                                        Add Subtask
+                                    </button>
+
+                                    <button
+                                        type="submit"
+                                        class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+
+                <script type='text/javascript'>
+                    <?php
+                    $subtasks_mapped = array_map(function($subtask) {
+                        return [
+                            'id' => $subtask['subtask_id'],
+                            'name' => $subtask['subtask_name'],
+                            'dueDate' => $subtask['subtask_due_date'],
+                            'priority' => $subtask['subtask_priority'],
+                            'status' => $subtask['subtask_status']
+                        ];
+                    }, $subtasks);
+                    $subtasks_json = json_encode($subtasks_mapped);
+                    echo "const subtasksJSON = " . $subtasks_json . ";\n";
+                    ?>
+                </script>
+
+                <script type="module">
+                    import {
+                        createApp,
+                        ref
+                    } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+
+                    createApp({
+                        name: 'TaskManagementForm',
+
+                        data() {
+
+                            return {
+                                mainTask: {
+                                    name: "<?= htmlspecialchars($task['task_name']) ?>",
+                                    description: "<?= htmlspecialchars($task['description']) ?>",
+                                    dueDate: "<?= htmlspecialchars($task['due_date']) ?>",
+                                    priority: "<?= htmlspecialchars($task['priority']) ?>",
+                                    status: "<?= htmlspecialchars($task['status']) ?>",
+                                },
+                                subtasks: subtasksJSON,
+                            }
+                        },
+
+                        methods: {
+                            addSubtask() {
+                                this.subtasks.push({
+                                    id: '',
+                                    name: '',
+                                    dueDate: '',
+                                    priority: 'Medium',
+                                    status: 'Not Started'
+                                })
+                            },
+
+                            removeSubtask(index) {
+                                this.subtasks.splice(index, 1)
+                            },
+
+                        }
+                    }).mount('#app')
+                </script>
+
+                <!-- <div class="container-fluid px-4">
                     <h1 class="mt-4">Edit Task</h1>
                     <ol class="breadcrumb mb-4">
                         <li class="breadcrumb-item-active">Please fill out the details of your task and subtasks that you want to edit</li>
                     </ol>
                     <div class="row">
-                    <div class="col-xl-3 col-md-6"></div>
-                    <form action="edit_task.php?task_id=<?= $task_id ?>" method="POST">
-                            <div class="edit-task-container"> 
+                        <div class="col-xl-3 col-md-6"></div>
+                        <form action="edit_task.php?task_id=<?= $task_id ?>" method="POST">
+                            <div class="edit-task-container">
                                 <div class="main-task-form">
                                     <h2 class="main-task-title">Edit Main Task</h2>
                                     <p class="main-task-description">Edit the details of the main task</p>
-                                
+
                                     <div class="form-floating mb-3">
                                         <input type="text" name="task_name" class="form-control" value="<?= htmlspecialchars($task['task_name']) ?>" required>
                                         <label for="task_name">Task Name:</label>
                                     </div>
-                       
+
                                     <div class="form-floating mb-3">
                                         <input type="text" name="description" class="form-control" value="<?= htmlspecialchars($task['description']) ?>" required>
                                         <label for="description">Task Description:</label>
@@ -210,72 +430,72 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 </div>
 
                                 <div class="subtask-form">
-                                <h2 class="subtask-title">Edit Subtasks</h2>
-                                <p class="subtask-description">Edit the details of the subtasks</p>
+                                    <h2 class="subtask-title">Edit Subtasks</h2>
+                                    <p class="subtask-description">Edit the details of the subtasks</p>
 
-                                <div id="subtask-group">
-                                    <?php foreach ($subtasks as $index => $subtask): ?>
-                                    <div class="subtask-group mb-3">
-                                        <h5>Subtask <?= $index + 1 ?></h5>
-                                        <div class="form-floating mb-3">
-                                            <input type="text" name="subtask_name[]" class="form-control" value="<?= htmlspecialchars($subtask['subtask_name']) ?>" required>
-                                            <label>Subtask Name:</label>
-                                        </div>
-                                        <div class="form-floating mb-3">
-                                         <input type="date" name="subtask_due_date[]" class="form-control" value="<?= htmlspecialchars($subtask['subtask_due_date']) ?>" required>
-                                         <label>Due Date:</label>
-                                        </div>
-                                        <div class="form-floating mb-3">
-                                            <select name="subtask_priority[]" class="form-control" required>
-                                                <option value="Low" <?= $subtask['subtask_priority'] === 'Low' ? 'selected' : '' ?>>Low</option>
-                                                <option value="Medium" <?= $subtask['subtask_priority'] === 'Medium' ? 'selected' : '' ?>>Medium</option>
-                                                <option value="High" <?= $subtask['subtask_priority'] === 'High' ? 'selected' : '' ?>>High</option>
-                                            </select>
-                                            <label>Priority:</label>
-                                        </div>
-                                        <div class="form-floating mb-3">
-                                            <input type="text" name="subtask_status[]"class="form-control" value="<?= htmlspecialchars($subtask['subtask_status']) ?>" required>
-                                        </div>
-                                    <?php endforeach; ?>
+                                    <div id="subtask-group">
+                                        <?php foreach ($subtasks as $index => $subtask): ?>
+                                            <div class="subtask-group mb-3">
+                                                <h5>Subtask <?= $index + 1 ?></h5>
+                                                <div class="form-floating mb-3">
+                                                    <input type="text" name="subtask_name[]" class="form-control" value="<?= htmlspecialchars($subtask['subtask_name']) ?>" required>
+                                                    <label>Subtask Name:</label>
+                                                </div>
+                                                <div class="form-floating mb-3">
+                                                    <input type="date" name="subtask_due_date[]" class="form-control" value="<?= htmlspecialchars($subtask['subtask_due_date']) ?>" required>
+                                                    <label>Due Date:</label>
+                                                </div>
+                                                <div class="form-floating mb-3">
+                                                    <select name="subtask_priority[]" class="form-control" required>
+                                                        <option value="Low" <?= $subtask['subtask_priority'] === 'Low' ? 'selected' : '' ?>>Low</option>
+                                                        <option value="Medium" <?= $subtask['subtask_priority'] === 'Medium' ? 'selected' : '' ?>>Medium</option>
+                                                        <option value="High" <?= $subtask['subtask_priority'] === 'High' ? 'selected' : '' ?>>High</option>
+                                                    </select>
+                                                    <label>Priority:</label>
+                                                </div>
+                                                <div class="form-floating mb-3">
+                                                    <input type="text" name="subtask_status[]" class="form-control" value="<?= htmlspecialchars($subtask['subtask_status']) ?>" required>
+                                                </div>
+                                            <?php endforeach; ?>
+                                            </div>
+                                            <div class="main-buttons">
+                                                <button type="button" class="btn btn-primary" onclick="addSubtask()">Add Subtask</button>
+                                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                            </div>
+                                    </div>
                                 </div>
-                                <div class="main-buttons">
-                                    <button type="button" class="btn btn-primary" onclick="addSubtask()">Add Subtask</button>
-                                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                                </div>
-                                </div>
-                            </div>
-                    </form>
+                        </form>
                     </div>
-                </div>
+                </div> -->
             </main>
             <footer class="py-4 bg-light mt-auto">
-                    <div class="container-fluid px-4">
-                        <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted"> &copy; 2024 Calendify. All rights reserved</div>
-                            <div>
-                                <a href="#">Privacy Policy</a>
-                                    &middot;
-                                <a href="#">Terms &amp; Conditions</a>
-                            </div>
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted"> &copy; 2024 Calendify. All rights reserved</div>
+                        <div>
+                            <a href="#">Privacy Policy</a>
+                            &middot;
+                            <a href="#">Terms &amp; Conditions</a>
                         </div>
                     </div>
+                </div>
             </footer>
         </div>
-    </div>                                   
+    </div>
 
-        <script>
-            function addSubtask() {
-                const subtaskForm = document.querySelector('.subtask-form'); // The container for subtasks
+    <script>
+        function addSubtask() {
+            const subtaskForm = document.querySelector('.subtask-form'); // The container for subtasks
 
-                // Create a new subtask HTML structure dynamically
-                const newSubtask = document.createElement('div');
-                newSubtask.classList.add('subtask-group', 'mb-3'); // Add a class for styling if needed
+            // Create a new subtask HTML structure dynamically
+            const newSubtask = document.createElement('div');
+            newSubtask.classList.add('subtask-group', 'mb-3'); // Add a class for styling if needed
 
-                // Add input fields for the new subtask
-                newSubtask.innerHTML = `
+            // Add input fields for the new subtask
+            newSubtask.innerHTML = `
                     <div class="form-floating mb-3"> 
-                    <input type="text" name="subtask_name[]" class="form-control" required>
-                    <label for="subtask_name">Subtask Name:</label>
+                        <input type="text" name="subtask_name[]" class="form-control" required>
+                        <label for="subtask_name">Subtask Name:</label>
                     </div>
                     <div class="form-floating mb-3"> 
                         <input type="date" name="subtask_due_date[]" class="form-control" required>
@@ -293,22 +513,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <button type="submit" class="btn btn-primary">Save Task</button>
                     `;
 
-                // Append the new subtask form to the container
-                subtaskForm.appendChild(newSubtask);
+            // Append the new subtask form to the container
+            subtaskForm.appendChild(newSubtask);
 
-                // Update button visibility
-                toggleButtons();
-            }
+            // Update button visibility
+            toggleButtons();
+        }
 
-            function removeSubtask(button) {
-                const subtaskGroup = button.parentElement; // Get the parent `.subtask-group` div
-                subtaskGroup.remove();
+        function removeSubtask(button) {
+            const subtaskGroup = button.parentElement; // Get the parent `.subtask-group` div
+            subtaskGroup.remove();
 
-                // Update button visibility
-                toggleButtons();
-            }
+            // Update button visibility
+            toggleButtons();
+        }
 
-            function toggleButtons() {
+        function toggleButtons() {
             const subtaskGroups = document.querySelectorAll('.subtask-group'); // Get all subtask groups
             const mainButtons = document.querySelector('.main-buttons'); // Main buttons container
 
@@ -319,21 +539,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // Hide the main buttons if subtasks exist
                 mainButtons.style.display = 'none';
 
-            // Ensure only the last subtask group displays its buttons
-            subtaskGroups.forEach((group, index) => {
-                const addButton = group.querySelector('.btn-primary'); // Add Another Subtask button
-                const saveButton = group.querySelector('.btn-primary'); // Save Task button
+                // Ensure only the last subtask group displays its buttons
+                subtaskGroups.forEach((group, index) => {
+                    const addButton = group.querySelector('.btn-primary'); // Add Another Subtask button
+                    const saveButton = group.querySelector('.btn-primary'); // Save Task button
 
-                if (index === subtaskGroups.length - 1) {
-                    // Show buttons for the last subtask group
-                    addButton.style.display = 'inline-block';
-                    saveButton.style.display = 'inline-block';
-                } else {
-                    // Hide buttons for all other subtask groups
-                    addButton.style.display = 'none';
-                    saveButton.style.display = 'none';
-                }
-            });
+                    if (index === subtaskGroups.length - 1) {
+                        // Show buttons for the last subtask group
+                        addButton.style.display = 'inline-block';
+                        saveButton.style.display = 'inline-block';
+                    } else {
+                        // Hide buttons for all other subtask groups
+                        addButton.style.display = 'none';
+                        saveButton.style.display = 'none';
+                    }
+                });
             }
 
             // Special case: Ensure first subtask always has buttons if it is the only one
@@ -345,14 +565,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 saveButton.style.display = 'inline-block';
             }
         }
-        </script>
+    </script>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-        <script src="js/scripts.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>       <script src="assets/demo/chart-area-demo.js"></script>
-        <script src="assets/demo/chart-bar-demo.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
-        <script src="js/datatables-simple-demo.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="js/scripts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+    <script src="assets/demo/chart-area-demo.js"></script>
+    <script src="assets/demo/chart-bar-demo.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+    <script src="js/datatables-simple-demo.js"></script>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </body>
-</html>
 
+</html>

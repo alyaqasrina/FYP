@@ -103,7 +103,7 @@ $result = mysqli_stmt_get_result($stmt);
                             <div class="card bg-danger text-white mb-4">
                                 <div class="card-body">High Priority
                                     <?php
-                                    $sql = "SELECT COUNT(*) AS total FROM tasks WHERE priority = 'High'";
+                                    $sql = "SELECT COUNT(*) AS total FROM tasks WHERE priority = 'High' AND user_id = $user_id";
                                     $result = mysqli_query($conn, $sql);
                                     $row = mysqli_fetch_assoc($result);
                                     echo "<h2>" . $row['total'] . "</h2>";
@@ -115,7 +115,7 @@ $result = mysqli_stmt_get_result($stmt);
                             <div class="card bg-warning text-white mb-4">
                                 <div class="card-body">Medium Priority
                                     <?php
-                                    $sql = "SELECT COUNT(*) AS total FROM tasks WHERE priority = 'Medium'";
+                                    $sql = "SELECT COUNT(*) AS total FROM tasks WHERE priority = 'Medium' AND user_id = $user_id";
                                     $result = mysqli_query($conn, $sql);
                                     $row = mysqli_fetch_assoc($result);
                                     echo "<h2>" . $row['total'] . "</h2>";
@@ -127,7 +127,7 @@ $result = mysqli_stmt_get_result($stmt);
                             <div class="card bg-primary text-white mb-4">
                                 <div class="card-body">Low Priority
                                     <?php
-                                    $sql = "SELECT COUNT(*) AS total FROM tasks WHERE priority = 'Low'";
+                                    $sql = "SELECT COUNT(*) AS total FROM tasks WHERE priority = 'Low' AND user_id = $user_id";
                                     $result = mysqli_query($conn, $sql);
                                     $row = mysqli_fetch_assoc($result);
                                     echo "<h2>" . $row['total'] . "</h2>";
@@ -164,6 +164,7 @@ $result = mysqli_stmt_get_result($stmt);
                                                     GROUP_CONCAT(CONCAT(s.subtask_name, ' (Due: ', s.subtask_due_date, ')') SEPARATOR '||') AS subtasks
                                                 FROM tasks t
                                                 LEFT JOIN subtasks s ON t.task_id = s.task_id
+                                                WHERE t.user_id = $user_id
                                                 GROUP BY t.task_id";
 
                                         $result = mysqli_query($conn, $query);
@@ -200,7 +201,7 @@ $result = mysqli_stmt_get_result($stmt);
                         </div>
                     </div>
                     <div class="add-task">
-                        <button onclick="window.location.href='add_task.php'" class="btn btn-primary" style="w 30px">Add Task</button>
+                        <button onclick="window.location.href='add_task.php'" class="btn btn-primary">Add Task</button>
                     </div>
                 </div>
             </main>

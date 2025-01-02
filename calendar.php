@@ -147,11 +147,13 @@ while ($row = $result->fetch_assoc()) {
                                 <?php if (!empty($tasks_by_month[$month_name])): ?>
                                     <?php foreach ($tasks_by_month[$month_name] as $task): ?>
                                         <div class="task">
-                                            <a href="tasks.php?id=<?= $task['task_id'] ?>">
+                                            <!-- <a href="tasks.php?id=<?= $task['task_id'] ?>"> -->
+                                                <h4>
                                                 <?= $task['task_name'] ?>
-                                                <?= date("d", strtotime($task['due_date'])) ?>
-                                                <?= $task_description['task_description']?>
-                                            </a>
+                                                </h4>
+                                                <p><?= $task['description'] ?></p>
+                                                <small><?= date("d M Y", strtotime($task['due_date'])) ?></small>
+                                            <!-- </a> -->
                                         </div>
                                     <?php endforeach; ?>
                                 <?php else: ?>
