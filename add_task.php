@@ -35,7 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $query = "INSERT INTO `tasks` (task_name, description, due_date, priority, complexity, user_id) 
               VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = mysqli_prepare($conn, $query);
-    mysqli_stmt_bind_param($stmt, "sssisi", $task_name, $task_description, $due_date, $priority, $complexity, $user_id);
+
+    mysqli_stmt_bind_param($stmt, "sssssi", $task_name, $task_description, $due_date, $priority, $complexity, $user_id);
 
     if (mysqli_stmt_execute($stmt)) {
         $task_id = mysqli_insert_id($conn); // Get the inserted task's ID
@@ -97,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         echo "<p>Error adding task: " . mysqli_error($conn) . "</p>";
     }
-}
+
 ?>
 
 <!DOCTYPE html>
