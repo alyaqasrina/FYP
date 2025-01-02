@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 include('db.php');
 
 $user_id = $_SESSION['user_id']; // Get the logged-in user's ID
@@ -20,14 +22,15 @@ function calculatePriority($dueTime, $priorityLevel, $complexity) {
     return $priorityScore + $complexityScore - $timeScore;
 }
 
-function calculateProgress()
+// function calculateProgress()
 
 // Fetch tasks from the database
-$query = "SELECT * FROM tasks WHERE due_date = CURDATE() AND priority IN ('high', 'medium', 'low')";
+$query = "SELECT * FROM `tasks` WHERE `due_date` <= CURDATE() AND priority IN ('High', 'Medium', 'Low') AND user_id = $user_id";
 $result = mysqli_query($conn, $query);
 
 $tasks = [];
-while ($row = mysqli_fetch_assoc($result)) {
+while ($row = $result -> fetch_assoc()) {
+
     $priority = calculatePriority($row['due_date'], $row['priority'], $row['complexity']);
     $tasks[] = ['task' => $row, 'priority' => $priority];
 }
@@ -36,7 +39,18 @@ usort($tasks, function($a, $b) {
     return $b['priority'] <=> $a['priority']; // Sort in descending order of priority
 });
 
-// Get the highest-priority task
-$topTask = $tasks[3]['task'];
+
+$transformedTasks = array_map(function($task) {
+    return [
+        'title' => $task['task']['task_name'],
+        'priority_level' => $task['task']['priority'],
+        'due_time' => $task['task']['due_date'],
+        'total_score' => $task['priority']
+    ];
+}, $tasks);
+
+header('Content-Type: application/json');
+echo json_encode($transformedTasks, JSON_PRETTY_PRINT);
+
 
 ?>
