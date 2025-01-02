@@ -14,12 +14,20 @@ if (isset($_GET['task_id'])) {
     $task_id = intval($_GET['task_id']);
 
     // Fetch main task details
+    // Prepare a SQL query to select a task based on task_id and user_id
     $task_query = "SELECT * FROM `tasks` WHERE `task_id` = ? AND `user_id` = ?";
+
+    // Initialize a prepared statement with the SQL query
     $stmt = mysqli_prepare($conn, $task_query);
+
+    // Bind the task_id and user_id parameters to the prepared statement
     mysqli_stmt_bind_param($stmt, "ii", $task_id, $user_id);
+
+    // Execute the prepared statement
     mysqli_stmt_execute($stmt);
-    $task_result = mysqli_stmt_get_result($stmt);
-    $task = mysqli_fetch_assoc($task_result);
+
+    // Fetch the result of the executed statement as an associative array
+    $task = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
     if (!$task) {
         die("Error: Task not found or you do not have access to it.");
