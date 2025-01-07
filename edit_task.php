@@ -41,12 +41,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $task_name = mysqli_real_escape_string($conn, $_POST['task_name']);
     $task_description = mysqli_real_escape_string($conn, $_POST['description']);
     $due_date = mysqli_real_escape_string($conn, $_POST['due_date']);
+    $due_time = mysqli_real_escape_string($conn, $_POST['due_time']);
     $priority = mysqli_real_escape_string($conn, $_POST['priority']);
 
     // Update main task
     $update_task_query = "UPDATE `tasks` SET `task_name` = ?, `description` = ?, `due_date` = ?, `priority` = ? WHERE `task_id` = ? AND `user_id` = ?";
     $stmt = mysqli_prepare($conn, $update_task_query);
-    mysqli_stmt_bind_param($stmt, "ssssii", $task_name, $task_description, $due_date, $priority, $task_id, $user_id);
+
+    $due_date_time = $due_date . ' ' . $due_time;
+
+    mysqli_stmt_bind_param($stmt, "ssssii", $task_name, $task_description, $due_date_time, $priority, $task_id, $user_id);
 
     if (!mysqli_stmt_execute($stmt)) {
         die("Error updating task: " . mysqli_error($conn));
@@ -56,14 +60,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $subtask_ids = $_POST['subtask_id'] ?? [];
     $subtask_names = $_POST['subtask_name'] ?? [];
     $subtask_due_dates = $_POST['subtask_due_date'] ?? [];
+    $subtask_due_times = $_POST['subtask_due_time'] ?? [];
     $subtask_priorities = $_POST['subtask_priority'] ?? [];
 
     foreach ($subtask_ids as $index => $subtask_id) {
         $subtask_name = mysqli_real_escape_string($conn, $subtask_names[$index]);
         $subtask_due_date = mysqli_real_escape_string($conn, $subtask_due_dates[$index]);
+        $subtask_due_time = mysqli_real_escape_string($conn, $subtask_due_times[$index]);
         $subtask_priority = mysqli_real_escape_string($conn, $subtask_priorities[$index]);
 
-        if (empty($subtask_name) || empty($subtask_due_date) || empty($subtask_priority)) {
+        if (empty($subtask_name) || empty($subtask_due_date) || empty($subtask_priority) || empty($subtask_due_time)) {
             die("Error: All subtask fields are required.");
         }
 
@@ -71,12 +77,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($subtask_id) {
             $update_subtask_query = "UPDATE `subtasks` SET `subtask_name` = ?, `subtask_due_date` = ?, `subtask_priority` = ? WHERE `subtask_id` = ? AND `task_id` = ?";
             $stmt = mysqli_prepare($conn, $update_subtask_query);
-            mysqli_stmt_bind_param($stmt, "sssii", $subtask_name, $subtask_due_date, $subtask_priority, $subtask_id, $task_id);
+
+            $subtask_due_date_time = $subtask_due_date . ' ' . $subtask_due_time;
+
+            mysqli_stmt_bind_param($stmt, "sssii", $subtask_name, $subtask_due_date_time, $subtask_priority, $subtask_id, $task_id);
             mysqli_stmt_execute($stmt);
         } else {
             $insert_subtask_query = "INSERT INTO `subtasks` (`task_id`, `subtask_name`, `subtask_due_date`, `subtask_priority`) VALUES (?, ?, ?, ?)";
             $stmt = mysqli_prepare($conn, $insert_subtask_query);
-            mysqli_stmt_bind_param($stmt, "isss", $task_id, $subtask_name, $subtask_due_date, $subtask_priority);
+
+            $subtask_due_date_time = $subtask_due_date . ' ' . $subtask_due_time;
+
+            mysqli_stmt_bind_param($stmt, "isss", $task_id, $subtask_name, $subtask_due_date_time, $subtask_priority);
             mysqli_stmt_execute($stmt);
         }
     }
@@ -113,10 +125,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
-        <a class="navbar-brand ps-3" href="homepage.php">
-            <img src="path/to/logo.png" style="height: 30px; width: auto;">
-            Calendify
-        </a>
+        <?php include('calendify_brand.php') ?>
+
         <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
         <!-- Navbar Search-->
@@ -127,19 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </form>
         <!-- Navbar-->
-        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-                    <li><a class="dropdown-item" href="settings.php">Setting</a></li>
-                    <li>
-                        <hr class="dropdown-divider" />
-                    </li>
-                    <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-                </ul>
-            </li>
-        </ul>
+        <?php include('profile_navbar.php') ?>
     </nav>
 
     <div id="layoutSidenav">
@@ -155,12 +153,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             Dashboard
                         </a>
                         <div class="sb-sidenav-menu-heading">Task</div>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                        <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                             <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                             Overview
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
-                        <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                        <div class="collapse show" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
                                 <a class="nav-link" href="task.php">Task</a>
                                 <a class="nav-link" href="monitor_status.php">Monitor Status</a>
@@ -213,6 +211,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                             v-model="mainTask.dueDate"
                                             type="date"
                                             name="due_date"
+                                            class="w-full p-2 border rounded">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Due Time:</label>
+                                        <input
+                                            v-model="mainTask.dueTime"
+                                            type="time"
+                                            name="due_time"
                                             class="w-full p-2 border rounded">
                                     </div>
 
@@ -277,6 +284,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         </div>
 
                                         <div>
+                                            <label class="block text-sm font-medium mb-1">Due Time:</label>
+                                            <input
+                                                v-model="subtask.dueTime"
+                                                type="time"
+                                                name="subtask_due_time[]"
+                                                class="w-full p-2 border rounded">
+                                        </div>
+
+                                        <div>
                                             <label class="block text-sm font-medium mb-1">Priority:</label>
                                             <select
                                                 v-model="subtask.priority"
@@ -331,11 +347,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 <script type='text/javascript'>
                     <?php
-                    $subtasks_mapped = array_map(function($subtask) {
+                    $subtasks_mapped = array_map(function ($subtask) {
                         return [
                             'id' => $subtask['subtask_id'],
                             'name' => $subtask['subtask_name'],
-                            'dueDate' => $subtask['subtask_due_date'],
+                            'dueDate' => explode(' ', $subtask['subtask_due_date'])[0] ?: '',
+                            'dueTime' => isset(explode(' ', $subtask['subtask_due_date'])[1]) ? explode(' ', $subtask['subtask_due_date'])[1] : '',
                             'priority' => $subtask['subtask_priority'],
                             'status' => $subtask['subtask_status']
                         ];
@@ -360,7 +377,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 mainTask: {
                                     name: "<?= htmlspecialchars($task['task_name']) ?>",
                                     description: "<?= htmlspecialchars($task['description']) ?>",
-                                    dueDate: "<?= htmlspecialchars($task['due_date']) ?>",
+                                    dueDate: "<?= htmlspecialchars(explode(' ', $task['due_date'])[0] ?: '') ?>",
+                                    dueTime: "<?= htmlspecialchars(isset(explode(' ', $task['due_date'])[1]) ? explode(' ', $task['due_date'])[1] : '') ?>",
                                     priority: "<?= htmlspecialchars($task['priority']) ?>",
                                     status: "<?= htmlspecialchars($task['status']) ?>",
                                 },
@@ -374,6 +392,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     id: '',
                                     name: '',
                                     dueDate: '',
+                                    dueTime: '',
                                     priority: 'Medium',
                                     status: 'Not Started'
                                 })
@@ -387,86 +406,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     }).mount('#app')
                 </script>
 
-                <!-- <div class="container-fluid px-4">
-                    <h1 class="mt-4">Edit Task</h1>
-                    <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item-active">Please fill out the details of your task and subtasks that you want to edit</li>
-                    </ol>
-                    <div class="row">
-                        <div class="col-xl-3 col-md-6"></div>
-                        <form action="edit_task.php?task_id=<?= $task_id ?>" method="POST">
-                            <div class="edit-task-container">
-                                <div class="main-task-form">
-                                    <h2 class="main-task-title">Edit Main Task</h2>
-                                    <p class="main-task-description">Edit the details of the main task</p>
-
-                                    <div class="form-floating mb-3">
-                                        <input type="text" name="task_name" class="form-control" value="<?= htmlspecialchars($task['task_name']) ?>" required>
-                                        <label for="task_name">Task Name:</label>
-                                    </div>
-
-                                    <div class="form-floating mb-3">
-                                        <input type="text" name="description" class="form-control" value="<?= htmlspecialchars($task['description']) ?>" required>
-                                        <label for="description">Task Description:</label>
-                                    </div>
-
-                                    <div class="form-floating mb-3">
-                                        <input type="date" name="due_date" class="form-control" value="<?= htmlspecialchars($task['due_date']) ?>" required>
-                                        <label for="due_date">Due Date:</label>
-                                    </div>
-
-                                    <div class="form-floating mb-3">
-                                        <select name="priority" class="form-control" required>
-                                            <option value="Low" <?= $task['priority'] === 'Low' ? 'selected' : '' ?>>Low</option>
-                                            <option value="Medium" <?= $task['priority'] === 'Medium' ? 'selected' : '' ?>>Medium</option>
-                                            <option value="High" <?= $task['priority'] === 'High' ? 'selected' : '' ?>>High</option>
-                                        </select>
-                                        <label for="priority">Priority:</label>
-                                    </div>
-                                    <div class="form-floating mb-3">
-                                        <input type="text" name="status" class="form-control" value="<?= htmlspecialchars($task['status']) ?>" required>
-                                        <label for="status">Task Status:</label>
-                                    </div>
-                                </div>
-
-                                <div class="subtask-form">
-                                    <h2 class="subtask-title">Edit Subtasks</h2>
-                                    <p class="subtask-description">Edit the details of the subtasks</p>
-
-                                    <div id="subtask-group">
-                                        <?php foreach ($subtasks as $index => $subtask): ?>
-                                            <div class="subtask-group mb-3">
-                                                <h5>Subtask <?= $index + 1 ?></h5>
-                                                <div class="form-floating mb-3">
-                                                    <input type="text" name="subtask_name[]" class="form-control" value="<?= htmlspecialchars($subtask['subtask_name']) ?>" required>
-                                                    <label>Subtask Name:</label>
-                                                </div>
-                                                <div class="form-floating mb-3">
-                                                    <input type="date" name="subtask_due_date[]" class="form-control" value="<?= htmlspecialchars($subtask['subtask_due_date']) ?>" required>
-                                                    <label>Due Date:</label>
-                                                </div>
-                                                <div class="form-floating mb-3">
-                                                    <select name="subtask_priority[]" class="form-control" required>
-                                                        <option value="Low" <?= $subtask['subtask_priority'] === 'Low' ? 'selected' : '' ?>>Low</option>
-                                                        <option value="Medium" <?= $subtask['subtask_priority'] === 'Medium' ? 'selected' : '' ?>>Medium</option>
-                                                        <option value="High" <?= $subtask['subtask_priority'] === 'High' ? 'selected' : '' ?>>High</option>
-                                                    </select>
-                                                    <label>Priority:</label>
-                                                </div>
-                                                <div class="form-floating mb-3">
-                                                    <input type="text" name="subtask_status[]" class="form-control" value="<?= htmlspecialchars($subtask['subtask_status']) ?>" required>
-                                                </div>
-                                            <?php endforeach; ?>
-                                            </div>
-                                            <div class="main-buttons">
-                                                <button type="button" class="btn btn-primary" onclick="addSubtask()">Add Subtask</button>
-                                                <button type="submit" class="btn btn-primary">Save Changes</button>
-                                            </div>
-                                    </div>
-                                </div>
-                        </form>
-                    </div>
-                </div> -->
             </main>
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">

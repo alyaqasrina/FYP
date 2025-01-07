@@ -2,6 +2,13 @@
 session_start();
 include('db.php'); // Ensure this connects properly to the database
 
+$user_id = $_SESSION['user_id'] ?? null;
+
+if ($user_id) {
+    header('Location: homepage.php');
+    exit();
+}
+
 // Enable error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
