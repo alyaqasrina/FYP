@@ -75,7 +75,7 @@ while ($row = $result->fetch_assoc()) {
                     <div class="sb-sidenav-menu">
                         <div class="nav">
                             <div class="sb-sidenav-menu-heading"><Main></Main></div>
-                            <a class="nav-link" href="homepage.php">
+                            <a class="nav-link" href="homepage">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Dashboard
                             </a>
@@ -87,9 +87,9 @@ while ($row = $result->fetch_assoc()) {
                             </a>
                             <div class="collapse show" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="task.php">Task</a>
-                                    <a class="nav-link" href="monitor_status.php">Monitor Status</a>
-                                    <a class="nav-link" href="calendar.php">Calendar</a>
+                                    <a class="nav-link" href="task">Task</a>
+                                    <a class="nav-link" href="monitor_status">Monitor Status</a>
+                                    <a class="nav-link" href="calendar">Calendar</a>
                                 </nav>
                             </div>
                         </div>
@@ -143,7 +143,7 @@ while ($row = $result->fetch_assoc()) {
                                 <?php if (!empty($tasks_by_month[$month_name])): ?>
                                     <?php foreach ($tasks_by_month[$month_name] as $task): ?>
                                         <div class="task">
-                                            <!-- <a href="tasks.php?id=<?= $task['task_id'] ?>"> -->
+                                            <!-- <a href="tasks?id=<?= $task['task_id'] ?>"> -->
                                                 <h4>
                                                 <?= $task['task_name'] ?>
                                                 </h4>
@@ -161,10 +161,10 @@ while ($row = $result->fetch_assoc()) {
                         <!-- Navigation Buttons -->
                         <div class="navigation-buttons text-center my-4">
                             <?php if ($page === 'second-half'): ?>
-                                <a href="calendar.php?page=first-half" class="btn btn-primary">Previous</a>
+                                <a href="calendar?page=first-half" class="btn btn-primary">Previous</a>
                             <?php endif; ?>
                             <?php if ($page === 'first-half'): ?>
-                                <a href="calendar.php?page=second-half" class="btn btn-primary">Next</a>
+                                <a href="calendar?page=second-half" class="btn btn-primary">Next</a>
                             <?php endif; ?>
                         </div>                       
                     </div>

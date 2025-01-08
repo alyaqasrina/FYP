@@ -16,6 +16,6 @@
 $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
 $_SESSION['access_token'] = $token;
 
-header('Location: calendar.php');
+header('Location: calendar');
 exit();
 ?>

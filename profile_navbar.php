@@ -3,7 +3,7 @@
 $user_id = $_SESSION['user_id'] ?? null;
 
 if (!$user_id) {
-    header('Location: login.php');
+    header('Location: login');
     exit();
 }
 
@@ -28,12 +28,12 @@ if (!$user_id) {
                 </h5>
             </li>
 
-            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-            <li><a class="dropdown-item" href="settings.php">Setting</a></li>
+            <li><a class="dropdown-item" href="profile">Profile</a></li>
+            <li><a class="dropdown-item" href="settings">Setting</a></li>
             <li>
                 <hr class="dropdown-divider" />
             </li>
-            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+            <li><a class="dropdown-item" href="logout">Logout</a></li>
         </ul>
     </li>
 </ul>

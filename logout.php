@@ -4,10 +4,10 @@ session_start(); // Start the session to access session variables
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['logout'])) {
         session_destroy(); // Destroy the session
-        header('Location: login.php'); // Redirect to login page
+        header('Location: login'); // Redirect to login page
         exit();
     } elseif (isset($_POST['cancel'])) {
-        header('Location: homepage.php'); // Redirect to homepage or another appropriate page
+        header('Location: homepage'); // Redirect to homepage or another appropriate page
         exit();
     }
 }
@@ -30,11 +30,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <h1>CALENDIFY</h1>
         </div>
         <ul class="nav-links">
-            <li><a href="homepage.php">Home</a></li>
-            <li><a href="tasks.php">Tasks</a></li>
-            <li><a href="calendar.php">Calendar</a></li>
-            <li><a href="setting.php">Settings</a></li>
-            <li><a href="logout.php">Logout</a></li>
+            <li><a href="homepage">Home</a></li>
+            <li><a href="tasks">Tasks</a></li>
+            <li><a href="calendar">Calendar</a></li>
+            <li><a href="setting">Settings</a></li>
+            <li><a href="logout">Logout</a></li>
         </ul>
         <input type="text" class="search-bar" placeholder="Search in site">
     </nav>
@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <main class="content">
         <section class="logout-section">
             <h4>Are you sure you want to logout?</h4>
-            <form action="logout.php" method="post">
+            <form action="logout" method="post">
                 <button type="submit" name="logout" class="logout">Logout</button>
                 <button type="submit" name="cancel" class="cancel">Cancel</button>
             </form>

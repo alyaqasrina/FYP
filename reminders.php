@@ -4,7 +4,7 @@ include('db.php');
 
 // Ensure the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    header('Location: login');
     exit();
 }
 
@@ -45,7 +45,7 @@ unset($_SESSION['success'], $_SESSION['error']);
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
-        <a class="navbar-brand ps-3" href="homepage.php">
+        <a class="navbar-brand ps-3" href="homepage">
             <img src="path/to/logo.png" style="height: 30px; width: auto;">
             Calendify
         </a>
@@ -67,7 +67,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                 <div class="sb-sidenav-menu">
                     <div class="nav">
                         <div class="sb-sidenav-menu-heading"><Main></Main></div>
-                        <a class="nav-link" href="homepage.php">
+                        <a class="nav-link" href="homepage">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
@@ -78,8 +78,8 @@ unset($_SESSION['success'], $_SESSION['error']);
                         </a>
                         <div class="collapse show" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" href="settings.php">Profile & Notifications</a>
-                                <a class="nav-link" href="send_reminder.php">Send Reminder</a>
+                                <a class="nav-link" href="settings">Profile & Notifications</a>
+                                <a class="nav-link" href="send_reminder">Send Reminder</a>
                             </nav>
                         </div>
                     </div>

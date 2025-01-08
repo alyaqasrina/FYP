@@ -3,7 +3,7 @@ session_start();
 include('db.php');
 
 if (!isset($_SESSION['username'])) {
-    header('Location: login.php');
+    header('Location: login');
     exit();
 }
 
@@ -53,7 +53,7 @@ $user = mysqli_fetch_assoc($user_result);
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                 <div class="sb-sidenav-menu">
                     <div class="nav">
-                        <a class="nav-link" href="homepage.php">
+                        <a class="nav-link" href="homepage">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div> Dashboard
                         </a>
                         <div class="sb-sidenav-menu-heading">Task</div>
@@ -63,9 +63,9 @@ $user = mysqli_fetch_assoc($user_result);
                         </a>
                         <div class="collapse show" id="collapseLayouts">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" href="task.php">Task</a>
-                                <a class="nav-link" href="monitor_status.php">Monitor Status</a>
-                                <a class="nav-link" href="calendar.php">Calendar</a>
+                                <a class="nav-link" href="task">Task</a>
+                                <a class="nav-link" href="monitor_status">Monitor Status</a>
+                                <a class="nav-link" href="calendar">Calendar</a>
                             </nav>
                         </div>
                     </div>

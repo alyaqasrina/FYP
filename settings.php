@@ -8,7 +8,7 @@ ini_set('display_errors', 1);
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    header('Location: login');
     exit();
 }
 
@@ -70,7 +70,7 @@ $notification_method = isset($_POST['notification_method']) ? $_POST['notificati
                 <div class="sb-sidenav-menu">
                     <div class="nav">
                         <div class="sb-sidenav-menu-heading"><Main></Main></div>
-                        <a class="nav-link" href="homepage.php">
+                        <a class="nav-link" href="homepage">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
@@ -82,8 +82,8 @@ $notification_method = isset($_POST['notification_method']) ? $_POST['notificati
                         </a>
                         <div class="collapse show" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" href="settings.php">Profile & Notifications</a>
-                                <a class="nav-link" href="reminders.php">Send Reminder</a>
+                                <a class="nav-link" href="settings">Profile & Notifications</a>
+                                <a class="nav-link" href="reminders">Send Reminder</a>
                             </nav>
                         </div>
                     </div>

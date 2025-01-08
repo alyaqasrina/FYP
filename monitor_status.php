@@ -60,7 +60,7 @@ $user = mysqli_fetch_assoc($result);
                 <div class="sb-sidenav-menu">
                     <div class="nav">
                         <div class="sb-sidenav-menu-heading"><Main></Main></div>
-                        <a class="nav-link" href="homepage.php">
+                        <a class="nav-link" href="homepage">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
@@ -72,9 +72,9 @@ $user = mysqli_fetch_assoc($result);
                         </a>
                         <div class="collapse show" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" href="task.php">Task</a>
-                                <a class="nav-link" href="monitor_status.php">Monitor Status</a>
-                                <a class="nav-link" href="calendar.php">Calendar</a>
+                                <a class="nav-link" href="task">Task</a>
+                                <a class="nav-link" href="monitor_status">Monitor Status</a>
+                                <a class="nav-link" href="calendar">Calendar</a>
                             </nav>
                         </div>
                     </div>

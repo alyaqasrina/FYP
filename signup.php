@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </form>
                     </div>
                     <div class="card-footer text-center py-3">
-                        <div class="small"><a href="login.php">Have an account? Go to login</a></div>
+                        <div class="small"><a href="login">Have an account? Go to login</a></div>
                     </div>
                 </div>
             </div>

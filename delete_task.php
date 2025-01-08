@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                 <div class="sb-sidenav-menu">
                     <div class="nav">
-                        <a class="nav-link" href="homepage.php">
+                        <a class="nav-link" href="homepage">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
@@ -106,9 +106,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </a>
                         <div class="collapse show" id="collapseLayouts">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" href="task.php">Task</a>
-                                <a class="nav-link" href="monitor_status.php">Monitor Status</a>
-                                <a class="nav-link" href="calendar.php">Calendar</a>
+                                <a class="nav-link" href="task">Task</a>
+                                <a class="nav-link" href="monitor_status">Monitor Status</a>
+                                <a class="nav-link" href="calendar">Calendar</a>
                             </nav>
                         </div>
                     </div>
@@ -148,10 +148,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </div>
                     </div>
                     <div class="form-buttons">
-                        <form action="delete_task.php?task_id=<?= $task_id ?>" method="POST" style="display: inline;">
+                        <form action="delete_task?task_id=<?= $task_id ?>" method="POST" style="display: inline;">
                             <button type="submit" class="btn btn-danger">Delete Task</button>
                         </form>
-                        <a href="task.php" class="btn btn-secondary">Cancel</a>
+                        <a href="task" class="btn btn-secondary">Cancel</a>
                     </div>
                 </div>
             </main>

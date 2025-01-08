@@ -11,7 +11,7 @@
     <title>Calendify</title> 
     <nav class="navbar">
         <div class="logo">
-            <img src="logo_new.png" alt="Calendify Logo" href="index.php">
+            <img src="logo_new.png" alt="Calendify Logo" href="index">
             <h3 class="navbar-title">CALENDIFY</h3>
         </div>
     </nav>

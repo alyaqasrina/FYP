@@ -5,7 +5,7 @@ include('db.php'); // Ensure this connects properly to the database
 $user_id = $_SESSION['user_id'] ?? null;
 
 if ($user_id) {
-    header('Location: homepage.php');
+    header('Location: homepage');
     exit();
 }
 
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['username'] = $user['username'];
 
         // Redirect to homepage
-        header('Location: homepage.php');
+        header('Location: homepage');
         exit();
     } else {
         $error = "Invalid email or password.";
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     </form>
                                 </div>
                                 <div class="card-footer text-center py-3">
-                                    <div class="small"><a href="signup.php">Need an account? Sign up!</a></div>
+                                    <div class="small"><a href="signup">Need an account? Sign up!</a></div>
                                 </div>
                             </div>
                         </div>
