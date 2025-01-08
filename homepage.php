@@ -255,7 +255,7 @@ $result = mysqli_stmt_get_result($stmt);
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('prioritize_task.php') // Fetch data from the backend
+            fetch('prioritize_task') // Fetch data from the backend
                 .then(response => response.json())
                 .then(data => {
                     const taskList = document.getElementById('prioritized-task-list');

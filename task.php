@@ -221,7 +221,7 @@ $user = mysqli_fetch_assoc($user_result);
     <script src="js/datatables-simple-demo.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('prioritize_task.php') // Fetch data from the backend
+            fetch('prioritize_task') // Fetch data from the backend
                 .then(response => response.json())
                 .then(data => {
                     const taskList = document.getElementById('prioritized-task-list');
