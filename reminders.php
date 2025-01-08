@@ -59,17 +59,7 @@ unset($_SESSION['success'], $_SESSION['error']);
             </div>
         </form>
         <!-- Navbar-->
-        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-                    <li><a class="dropdown-item" href="settings.php">Setting</a></li>
-                    <li><hr class="dropdown-divider" /></li>
-                    <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-                </ul>
-            </li>
-        </ul>
+        <?php include('profile_navbar.php') ?>
     </nav>
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
@@ -81,12 +71,12 @@ unset($_SESSION['success'], $_SESSION['error']);
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                        <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                             <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                             Settings
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
-                        <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                        <div class="collapse show" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
                                 <a class="nav-link" href="settings.php">Profile & Notifications</a>
                                 <a class="nav-link" href="send_reminder.php">Send Reminder</a>
@@ -188,8 +178,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                                 <div class="mb-3 form-group">
                                     <select class="form-select " id="notification_method" name="notification_method" required>
                                         <option value="email">Email</option>
-                                        <option value="WhatsApp">Whatsapp</option>
-                                        <option value="in-app">In-app</option>
+                                        <option value="sms">SMS</option>
                                     </select>
                                     <label for="notification_method" class="form-label">Notification Method</label>
                                 </div>

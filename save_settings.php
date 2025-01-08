@@ -15,6 +15,13 @@ $phone = mysqli_real_escape_string($conn, $_POST['phone_number']);
 $notification_method = mysqli_real_escape_string($conn, $_POST['notification_method']);
 $user_id = $_SESSION['user_id'];
 
+// Validate notification method
+$valid_methods = ['email', 'sms', 'both']; // adjust these values based on your database enum/varchar values
+if (!in_array($notification_method, $valid_methods)) {
+    header("Location: settings.php?status=error&message=Invalid notification method");
+    exit();
+}
+
 // Update query
 $query = "UPDATE users SET username=?, email=?, phone_number=?, notification_method=? WHERE user_id=?";
 $stmt = mysqli_prepare($conn, $query);

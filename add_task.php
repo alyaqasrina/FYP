@@ -16,27 +16,37 @@ function getPriorityClass($priority) {
     }
 }
 
+$user_id = $_SESSION['user_id'];
+$query = "SELECT * FROM users WHERE user_id = ?";
+$stmt = mysqli_prepare($conn, $query);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$user = mysqli_fetch_assoc($result);
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Check if user is logged in
     if (!isset($_SESSION['user_id'])) {
         die("Error: User is not logged in.");
     }
 
-    $user_id = $_SESSION['user_id'];
-
     // Validate and sanitize inputs
     $task_name = mysqli_real_escape_string($conn, $_POST['task_name']);
     $task_description = mysqli_real_escape_string($conn, $_POST['description']);
     $due_date = mysqli_real_escape_string($conn, $_POST['due_date']);
+    $due_time = mysqli_real_escape_string($conn, $_POST['due_time']);
     $priority = mysqli_real_escape_string($conn, $_POST['priority']);
     $complexity = mysqli_real_escape_string($conn, $_POST['complexity']);
 
     // Insert main task into the database
     $query = "INSERT INTO `tasks` (task_name, description, due_date, priority, complexity, user_id) 
               VALUES (?, ?, ?, ?, ?, ?)";
+
     $stmt = mysqli_prepare($conn, $query);
 
-    mysqli_stmt_bind_param($stmt, "sssssi", $task_name, $task_description, $due_date, $priority, $complexity, $user_id);
+    $concat_due_date = $due_date . ' ' . $due_time;
+
+    mysqli_stmt_bind_param($stmt, "sssssi", $task_name, $task_description, $concat_due_date, $priority, $complexity, $user_id);
 
     if (mysqli_stmt_execute($stmt)) {
         $task_id = mysqli_insert_id($conn); // Get the inserted task's ID
@@ -45,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Filter out empty entries in subtask arrays
             $subtask_names = array_filter($_POST['subtask_name']);
             $subtask_due_dates = array_filter($_POST['subtask_due_date']);
+            $subtask_due_times = array_filter($_POST['subtask_due_time']);
             $subtask_priorities = array_filter($_POST['subtask_priority']);
         
             // Ensure all arrays have the same number of elements
@@ -56,13 +67,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $subtask_stmt = mysqli_prepare($conn, $subtask_query);
         
             foreach ($subtask_names as $index => $subtask_name) {
-                if (empty($subtask_names[$index]) || empty($subtask_due_dates[$index]) || empty($subtask_priorities[$index])) {
+                if (empty($subtask_names[$index]) || empty($subtask_due_dates[$index]) || empty($subtask_priorities[$index]) || empty($subtask_due_times[$index])) {
                     die("Error: All subtask fields are required.");
                 }
         
                 $subtask_name = mysqli_real_escape_string($conn, $subtask_name);
                 $subtask_due_date = mysqli_real_escape_string($conn, $subtask_due_dates[$index]);
+                $subtask_due_time = mysqli_real_escape_string($conn, $subtask_due_times[$index]);
                 $subtask_priority = mysqli_real_escape_string($conn, $subtask_priorities[$index]);
+
+                $subtask_due_date = $subtask_due_date . ' ' . $subtask_due_time;
         
                 mysqli_stmt_bind_param($subtask_stmt, "isss", $task_id, $subtask_name, $subtask_due_date, $subtask_priority);
                 if (!mysqli_stmt_execute($subtask_stmt)) {
@@ -117,10 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
-        <a class="navbar-brand ps-3" href="homepage.php">
-            <img src="path/to/logo.png" style="height: 30px; width: auto;">
-            Calendify
-        </a>
+        <?php include('calendify_brand.php') ?>
         <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
         <!-- Navbar Search-->
@@ -131,17 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </form>
         <!-- Navbar-->
-        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-                    <li><a class="dropdown-item" href="settings.php">Setting</a></li>
-                    <li><hr class="dropdown-divider" /></li>
-                    <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-                </ul>
-            </li>
-        </ul>
+        <?php include('profile_navbar.php'); ?>
     </nav>
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
@@ -154,12 +155,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             Dashboard
                         </a>
                         <div class="sb-sidenav-menu-heading">Task</div>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                        <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                             <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                             Overview
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
-                        <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                        <div class="collapse show" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
                                 <a class="nav-link" href="task.php">Task</a>
                                 <a class="nav-link" href="monitor_status.php">Monitor Status</a>
@@ -206,6 +207,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 </div>
 
                                 <div class="form-floating mb-3"> 
+                                    <input type="time" name="due_time" class="form-control" required>
+                                    <label for="due_time">
+                                        Due Time:
+                                    </label>
+                                </div>
+
+                                <div class="form-floating mb-3"> 
                                     <select name="priority" class="form-control" id="inputPriority" name="priority" required>
                                         <option value="Low">Low</option>
                                         <option value="Medium">Medium</option>
@@ -233,6 +241,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <div class="form-floating mb-3"> 
                                     <input type="date" name="subtask_due_date[]" class="form-control" required>
                                     <label for="subtask_due_date">Due Date:</label>
+                                </div>
+                                <div class="form-floating mb-3"> 
+                                    <input type="time" name="subtask_due_time[]" class="form-control" required>
+                                    <label for="subtask_due_time">
+                                        Due Time:
+                                    </label>
                                 </div>
                                 <div class="form-floating mb-3"> 
                                     <select name="subtask_priority[]" class="form-control" required>

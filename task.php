@@ -21,10 +21,15 @@ mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
+$user_query = "SELECT * FROM users WHERE user_id = $user_id";
+$user_result = mysqli_query($conn, $user_query);
+$user = mysqli_fetch_assoc($user_result);
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -34,23 +39,14 @@ $result = mysqli_stmt_get_result($stmt);
     <link href="css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
+
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <a class="navbar-brand ps-3" href="homepage.php">
-            <img src="path/to/logo.png" style="height: 30px; width: auto;"> Calendify
-        </a>
+        <?php include('calendify_brand.php') ?>
+
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle"><i class="fas fa-bars"></i></button>
-        <ul class="navbar-nav ms-auto me-3 me-lg-4">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"><i class="fas fa-user fa-fw"></i></a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-                    <li><a class="dropdown-item" href="settings.php">Setting</a></li>
-                    <li><hr class="dropdown-divider" /></li>
-                    <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-                </ul>
-            </li>
-        </ul>
+        <?php include('profile_navbar.php') ?>
+
     </nav>
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
@@ -61,11 +57,11 @@ $result = mysqli_stmt_get_result($stmt);
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div> Dashboard
                         </a>
                         <div class="sb-sidenav-menu-heading">Task</div>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false">
+                        <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false">
                             <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div> Overview
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
-                        <div class="collapse" id="collapseLayouts">
+                        <div class="collapse show" id="collapseLayouts">
                             <nav class="sb-sidenav-menu-nested nav">
                                 <a class="nav-link" href="task.php">Task</a>
                                 <a class="nav-link" href="monitor_status.php">Monitor Status</a>
@@ -155,8 +151,8 @@ $result = mysqli_stmt_get_result($stmt);
                                 </thead>
                                 <tbody>
                                     <?php
-                                        // Update SQL query to use GROUP_CONCAT for subtasks
-                                        $query = "SELECT 
+                                    // Update SQL query to use GROUP_CONCAT for subtasks
+                                    $query = "SELECT 
                                                     t.task_id, 
                                                     t.task_name, 
                                                     t.priority, 
@@ -167,35 +163,35 @@ $result = mysqli_stmt_get_result($stmt);
                                                 WHERE t.user_id = $user_id
                                                 GROUP BY t.task_id";
 
-                                        $result = mysqli_query($conn, $query);
+                                    $result = mysqli_query($conn, $query);
 
-                                        $tasks = mysqli_fetch_all($result, MYSQLI_ASSOC);
+                                    $tasks = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-                                        foreach ($tasks as $task) {
-                                            echo '<tr>';
-                                            echo '<td>' . $task['task_name'] . '</td>';
-                                            echo '<td>' . $task['priority'] . '</td>';
-                                            echo '<td>' . $task['task_due_date'] . '</td>';
+                                    foreach ($tasks as $task) {
+                                        echo '<tr>';
+                                        echo '<td>' . $task['task_name'] . '</td>';
+                                        echo '<td>' . $task['priority'] . '</td>';
+                                        echo '<td>' . $task['task_due_date'] . '</td>';
 
-                                            // Generate bullet list for subtasks
-                                            if ($task['subtasks']) {
-                                                $subtasks = explode('||', $task['subtasks']);
-                                                echo '<td><ul>';
-                                                foreach ($subtasks as $subtask) {
-                                                    echo '<li>' . $subtask . '</li>';
-                                                }
-                                                echo '</ul></td>';
-                                            } else {
-                                                echo '<td>No subtasks</td>';
+                                        // Generate bullet list for subtasks
+                                        if ($task['subtasks']) {
+                                            $subtasks = explode('||', $task['subtasks']);
+                                            echo '<td><ul>';
+                                            foreach ($subtasks as $subtask) {
+                                                echo '<li>' . $subtask . '</li>';
                                             }
+                                            echo '</ul></td>';
+                                        } else {
+                                            echo '<td>No subtasks</td>';
+                                        }
 
-                                            echo '<td>
+                                        echo '<td>
                                                     <a href="edit_task.php?task_id=' . $task['task_id'] . '" class="btn btn-primary btn-sm">Edit</a>
                                                     <a href="delete_task.php?task_id=' . $task['task_id'] . '" class="btn btn-danger btn-sm">Delete</a>
                                                 </td>';
-                                            echo '</tr>';
-                                        }
-                                        ?>
+                                        echo '</tr>';
+                                    }
+                                    ?>
                                 </tbody>
                             </table>
                         </div>
@@ -224,36 +220,36 @@ $result = mysqli_stmt_get_result($stmt);
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
     <script src="js/datatables-simple-demo.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        fetch('prioritize_task.php') // Fetch data from the backend
-            .then(response => response.json())
-            .then(data => {
-                const taskList = document.getElementById('prioritized-task-list');
-                taskList.innerHTML = ''; // Clear placeholder
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('prioritize_task.php') // Fetch data from the backend
+                .then(response => response.json())
+                .then(data => {
+                    const taskList = document.getElementById('prioritized-task-list');
+                    taskList.innerHTML = ''; // Clear placeholder
 
-                if (data && data.length > 0) {
-                    // Populate prioritized tasks
-                    data.forEach(task => {
-                        const listItem = document.createElement('li');
-                        listItem.className = 'list-group-item';
-                        listItem.innerHTML = `
+                    if (data && data.length > 0) {
+                        // Populate prioritized tasks
+                        data.forEach(task => {
+                            const listItem = document.createElement('li');
+                            listItem.className = 'list-group-item';
+                            listItem.innerHTML = `
                             <strong>${task.title}</strong>
                             <br> Priority: ${task.priority_level} | Due: ${task.due_time} | Score: ${Math.round(task.total_score)}
                         `;
-                        taskList.appendChild(listItem);
-                    });
-                } else {
-                    taskList.innerHTML = '<li class="list-group-item">No high-priority tasks for today!</li>';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching prioritized tasks:', error);
-                const taskList = document.getElementById('prioritized-task-list');
-                taskList.innerHTML = '<li class="list-group-item text-danger">Failed to load prioritized tasks.</li>';
-            });
-    });
+                            taskList.appendChild(listItem);
+                        });
+                    } else {
+                        taskList.innerHTML = '<li class="list-group-item">No high-priority tasks for today!</li>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching prioritized tasks:', error);
+                    const taskList = document.getElementById('prioritized-task-list');
+                    taskList.innerHTML = '<li class="list-group-item text-danger">Failed to load prioritized tasks.</li>';
+                });
+        });
     </script>
 
 </body>
-</html>
 
+</html>

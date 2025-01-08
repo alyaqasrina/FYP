@@ -53,10 +53,8 @@ $result = mysqli_stmt_get_result($stmt);
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
-        <a class="navbar-brand ps-3" href="homepage.php">
-            <img src="path/to/logo.png" style="height: 30px; width: auto;">
-            Calendify
-        </a>
+        <?php include('calendify_brand.php') ?>
+
         <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
         <!-- Navbar Search-->
@@ -67,19 +65,7 @@ $result = mysqli_stmt_get_result($stmt);
             </div>
         </form>
         <!-- Navbar-->
-        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-                    <li><a class="dropdown-item" href="settings.php">Setting</a></li>
-                    <li>
-                        <hr class="dropdown-divider" />
-                    </li>
-                    <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-                </ul>
-            </li>
-        </ul>
+        <?php include('profile_navbar.php') ?>
     </nav>
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
@@ -94,12 +80,12 @@ $result = mysqli_stmt_get_result($stmt);
                             Dashboard
                         </a>
                         <div class="sb-sidenav-menu-heading">Task</div>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                        <a class="nav-link" aria-expanded="true" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                             <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                             Overview
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
-                        <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                        <div class="collapse show" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
                                 <a class="nav-link" href="task.php">Task</a>
                                 <a class="nav-link" href="monitor_status.php">Monitor Status</a>
@@ -129,7 +115,7 @@ $result = mysqli_stmt_get_result($stmt);
                             <div class="card bg-danger text-white mb-4">
                                 <div class="card-body">Today's High Priority Tasks
                                     <?php
-                                    $sql = "SELECT COUNT(*) AS total FROM tasks WHERE priority = 'High' AND due_date = CURDATE() AND user_id = ?";
+                                    $sql = "SELECT COUNT(*) AS total FROM tasks WHERE priority = 'High' AND user_id = ?";
                                     $stmt = mysqli_prepare($conn, $sql);
                                     mysqli_stmt_bind_param($stmt, "i", $user_id);
                                     mysqli_stmt_execute($stmt);
@@ -144,7 +130,7 @@ $result = mysqli_stmt_get_result($stmt);
                             <div class="card bg-warning text-white mb-4">
                                 <div class="card-body">Today's Medium Priority Tasks
                                     <?php
-                                    $sql = "SELECT COUNT(*) AS total FROM tasks WHERE priority = 'Medium' AND due_date = CURDATE() AND user_id = ?";
+                                    $sql = "SELECT COUNT(*) AS total FROM tasks WHERE priority = 'Medium' AND user_id = ?";
                                     $stmt = mysqli_prepare($conn, $sql);
                                     mysqli_stmt_bind_param($stmt, "i", $user_id);
                                     mysqli_stmt_execute($stmt);
@@ -159,7 +145,7 @@ $result = mysqli_stmt_get_result($stmt);
                             <div class="card bg-primary text-white mb-4">
                                 <div class="card-body">Today's Low Priority Tasks
                                     <?php
-                                    $sql = "SELECT COUNT(*) AS total FROM tasks WHERE priority = 'Low' AND due_date = CURDATE() AND user_id = ?";
+                                    $sql = "SELECT COUNT(*) AS total FROM tasks WHERE priority = 'Low' AND user_id = ?";
                                     $stmt = mysqli_prepare($conn, $sql);
                                     mysqli_stmt_bind_param($stmt, "i", $user_id);
                                     mysqli_stmt_execute($stmt);
@@ -199,8 +185,8 @@ $result = mysqli_stmt_get_result($stmt);
                                     <tr>
                                         <th>Name</th>
                                         <th>Task Due Date</th>
-                                        <th>Subtask </th>
-                                        <th>Subtask Due Date</th>
+                                        <th>Subtasks </th>
+                                        <th>Subtasks Due Date</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -212,19 +198,36 @@ $result = mysqli_stmt_get_result($stmt);
                                         $tasks = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
                                         //Fetch subtasks from the database
-                                        $query = "SELECT * FROM subtasks WHERE subtask_due_date = CURDATE()";
-                                        $result = mysqli_query($conn, $query);
-                                        $subtasks = mysqli_fetch_all($result, MYSQLI_ASSOC);
+                                        // $query = "SELECT * FROM subtasks";
+                                        // $result = mysqli_query($conn, $query);
+                                        // $subtasks = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
                                         // Display the tasks in the table
                                         foreach ($tasks as $task) {
+
+                                            $query = "SELECT * FROM subtasks WHERE task_id = " . $task['task_id'];
+                                            $result = mysqli_query($conn, $query);
+                                            $subtasks = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
                                             echo '<tr>';
                                             echo '<td>' . $task['task_name'] . '</td>';
                                             echo '<td>' . $task['due_date'] . '</td>';
-                                            echo '<td>' . $subtasks['subtask_name'] . '</td>';
-                                            echo '<td>' . $subtasks['subtask_due_date'] . '</td>';
-                                            echo '<td><a href="edit_task.php?id=' . $task['id'] . '" img>Edit</a></td>';
-                                            echo '<td><a href="delete_task.php?id=' . $task['id'] . '">Delete</a></td>';
+                                            
+                                            echo '<td>'  .  '<ul>';  
+                                            foreach ($subtasks as $subtask) {
+                                                echo '<li>' . $subtask['subtask_name'] . '</li>';
+                                            }
+                                            echo '</ul>' . '</td>';
+
+                                            echo '<td>' . '<ul>';
+                                            
+                                            foreach ($subtasks as $subtask) {
+                                                echo '<li>' . $subtask['subtask_due_date'] . '</li>';
+                                            }
+
+                                            echo '</ul>' . '</td>';
+                                            echo '<td><a href="edit_task.php?task_id=' . $task['task_id'] . '" img>Edit</a></td>';
+                                            echo '<td><a href="delete_task.php?task_id=' . $task['task_id'] . '">Delete</a></td>';
                                             echo '</tr>';
                                         }
                                         ?>
