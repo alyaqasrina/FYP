@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 } else {
     // Show the reset password form
     echo '<h1>Reset Password</h1>
-    <form action="resetPassword.php" method="post">
+    <form action="resetPassword" method="post">
             <input type="email" name="email" placeholder="Email" required>
             <input type="password" name="new_password" placeholder="New Password" required>
             <input type="hidden" name="csrf_token" value="' . htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') . '">
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body>
-    <form action="resetPassword.php" method="post">
+    <form action="resetPassword" method="post">
         <label for="email">Email</label>
         <input type="email" name="email" placeholder="Email" required>
         <label for="new_password">New Password</label>

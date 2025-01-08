@@ -113,7 +113,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                     <!-- Display reminders -->
                     <div class="row">
                     <div class="col-xl-3 col-md-6"></div>
-                    <form action="save_reminder.php" method="POST">
+                    <form action="save_reminder" method="POST">
                         <div class="reminder-container">
                             <div class="reminder-form">
                                 <!-- Reminder Frequency -->

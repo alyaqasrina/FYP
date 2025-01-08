@@ -178,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <div id="layoutSidenav_content">
             <main>
-                <form action="edit_task.php?task_id=<?= $task_id ?>" method="POST">
+                <form action="edit_task?task_id=<?= $task_id ?>" method="POST">
                     <div id="app" v-cloak>
                         <div class="container mx-auto p-4">
                             <!-- Main Task Form -->

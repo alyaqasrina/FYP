@@ -106,7 +106,7 @@ $notification_method = isset($_POST['notification_method']) ? $_POST['notificati
                     </ol>
                     <div class="row">
                     <div class="col-xl-3 col-md-6"></div>
-                    <form action="save_settings.php" method="POST">
+                    <form action="save_settings" method="POST">
                         <div class="settings-container">
                             <!-- Profile Settings -->
                             <div class="main-task-form">

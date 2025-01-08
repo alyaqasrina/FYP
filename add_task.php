@@ -185,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </ol>
                     <div class="row">
                     <div class="col-xl-3 col-md-6"></div>
-                    <form action="add_task.php" method="POST">
+                    <form action="add_task" method="POST">
                         <div class="add-task-container">
                             <div class="main-task-form">
                                 <h2 class="main-task-title">Main Task</h2>
