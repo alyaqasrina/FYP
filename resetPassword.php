@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($stmt->execute()) {
             echo "<script type='text/javascript'>
                     alert('Your password has been updated. Redirecting to login page.');
-                    window.location.href = 'index.php';
+                    window.location.href = '/';
                   </script>";
         } else {
             echo "<script type='text/javascript'>

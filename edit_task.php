@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     // JavaScript for Success Popup and Redirect
     echo "<script>
-    window.location.href = 'task.php';
+    window.location.href = 'task';
     </script>";
     exit;
 }

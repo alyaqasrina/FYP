@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($password !== $confirm_password) {
         echo "<div class='form'>
               <h3>Passwords do not match.</h3><br/>
-              <p class='link'>Click here to <a href='signup.php'>register</a> again.</p>
+              <p class='link'>Click here to <a href='signup'>register</a> again.</p>
               </div>";
     } else {
         // Check if username or email already exists
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($rows > 0) {
             echo "<div class='form'>
                   <h3>Username or email already exists.</h3><br/>
-                  <p class='link'>Click here to <a href='signup.php'>register</a> again.</p>
+                  <p class='link'>Click here to <a href='signup'>register</a> again.</p>
                   </div>";
         } else {
             // Hash the password
@@ -42,12 +42,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($result) {
                 echo "<div class='form'>
                       <h3>You are registered successfully.</h3><br/>
-                      <p class='link'>Click here to <a href='login.php'>login</a></p>
+                      <p class='link'>Click here to <a href='login'>login</a></p>
                       </div>";
             } else {
                 echo "<div class='form'>
                       <h3>Registration failed. Please try again.</h3><br/>
-                      <p class='link'>Click here to <a href='signup.php'>register</a> again.</p>
+                      <p class='link'>Click here to <a href='signup'>register</a> again.</p>
                       </div>";
             }
         }

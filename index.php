@@ -31,12 +31,12 @@
     <div class="index-wrapper">
         <div class="index-content-description">
             <h2>New to Calendify?</h2>
-            <button onclick="window.location.href='signup.php'" type="button" class="btn btn-primary">Sign up</button>
+            <button onclick="window.location.href='signup'" type="button" class="btn btn-primary">Sign up</button>
         </div>
         <div class="index-content-description">
             <h2>Already have an account?</h2>
-            <button onclick="window.location.href='login.php'" type="button" class="btn btn-primary">Log in</button>
-            <button onclick="window.location.href='resetPassword.php'" type="button" class="btn btn-primary">Reset Password</button>
+            <button onclick="window.location.href='login'" type="button" class="btn btn-primary">Log in</button>
+            <button onclick="window.location.href='resetPassword'" type="button" class="btn btn-primary">Reset Password</button>
         </div>
     </div>  
     </section>
@@ -44,9 +44,9 @@
     <section class="footer-section">
         <footer class="footer">
         <div class="footer-container">
-                <a href="homepage.php">Home</a>
-                <a href="aboutus.php">About Us</a>
-                <a href="privacypolicy.php">Privacy Policy</a>
+                <a href="homepage">Home</a>
+                <a href="aboutus">About Us</a>
+                <a href="privacypolicy">Privacy Policy</a>
         </div>
         <div class="footer-bottom">
             &copy; 2024 Calendify. All rights reserved.
