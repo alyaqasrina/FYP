@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         echo "</table>";
         echo "<p>Task added successfully!</p>";
-        echo "<button onclick='window.location.href=\"homepage.php\"' class='btn btn-primary'>Go Back</button>";
+        echo "<button onclick='window.location.href=\"homepage\"' class='btn btn-primary'>Go Back</button>";
     } else {
         echo "<p>Error adding task: " . mysqli_error($conn) . "</p>";
     }
@@ -275,9 +275,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="d-flex align-items-center justify-content-between small">
                     <div class="text-muted"> &copy; 2024 Calendify. All rights reserved</div>
                         <div>
-                            <a href="Privacy_policy.php">Privacy Policy</a>
+                            <a href="Privacy_policy">Privacy Policy</a>
                                 &middot;
-                            <a href="Terms_conditions.php">Terms &amp; Conditions</a>
+                            <a href="Terms_conditions">Terms &amp; Conditions</a>
                         </div>
                     </div>
                 </div>

@@ -7,7 +7,7 @@ require_once 'priority_utils.php';
 // Check user session
 if (!isset($_SESSION['user_id'])) {
     $_SESSION['error'] = "User not logged in!";
-    header("Location: login.php");
+    header("Location: login");
     exit();
 }
 
@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     mysqli_close($conn);
-    header("Location: reminders.php");
+    header("Location: reminders");
     exit();
 
 }

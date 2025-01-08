@@ -186,8 +186,8 @@ $user = mysqli_fetch_assoc($user_result);
                                         }
 
                                         echo '<td>
-                                                    <a href="edit_task.php?task_id=' . $task['task_id'] . '" class="btn btn-primary btn-sm">Edit</a>
-                                                    <a href="delete_task.php?task_id=' . $task['task_id'] . '" class="btn btn-danger btn-sm">Delete</a>
+                                                    <a href="edit_task?task_id=' . $task['task_id'] . '" class="btn btn-primary btn-sm">Edit</a>
+                                                    <a href="delete_task?task_id=' . $task['task_id'] . '" class="btn btn-danger btn-sm">Delete</a>
                                                 </td>';
                                         echo '</tr>';
                                     }
@@ -197,7 +197,7 @@ $user = mysqli_fetch_assoc($user_result);
                         </div>
                     </div>
                     <div class="add-task">
-                        <button onclick="window.location.href='add_task.php'" class="btn btn-primary">Add Task</button>
+                        <button onclick="window.location.href='add_task'" class="btn btn-primary">Add Task</button>
                     </div>
                 </div>
             </main>

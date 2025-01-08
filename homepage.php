@@ -226,8 +226,8 @@ $result = mysqli_stmt_get_result($stmt);
                                             }
 
                                             echo '</ul>' . '</td>';
-                                            echo '<td><a href="edit_task.php?task_id=' . $task['task_id'] . '" img>Edit</a></td>';
-                                            echo '<td><a href="delete_task.php?task_id=' . $task['task_id'] . '">Delete</a></td>';
+                                            echo '<td><a href="edit_task?task_id=' . $task['task_id'] . '" img>Edit</a></td>';
+                                            echo '<td><a href="delete_task?task_id=' . $task['task_id'] . '">Delete</a></td>';
                                             echo '</tr>';
                                         }
                                         ?>
